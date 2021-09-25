@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?><MD_Metadata xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:srv="http://www.isotc211.org/2005/srv" xmlns:gts="http://www.isotc211.org/2005/gts" xmlns:xalan="http://xml.apache.org/xalan" xmlns:gco="http://www.isotc211.org/2005/gco" xmlns:gml="http://www.opengis.net/gml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.isotc211.org/2005/gmd">
+    <characterSet>
+        <MD_CharacterSetCode codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_CharacterSetCode" codeListValue="utf8" codeSpace="ISOTC211/19115">utf8</MD_CharacterSetCode>
+    </characterSet>
+    <hierarchyLevel>
+        <MD_ScopeCode codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_ScopeCode" codeListValue="dataset" codeSpace="ISOTC211/19115">dataset</MD_ScopeCode>
+    </hierarchyLevel>
+    <hierarchyLevelName>
+        <gco:CharacterString>dataset</gco:CharacterString>
+    </hierarchyLevelName>
+    <contact gco:nilReason="missing"/>
+    <dateStamp gco:nilReason="missing"/>
+    <metadataStandardName>
+        <gco:CharacterString>ISO 19139 Geographic Information - Metadata - Implementation Specification</gco:CharacterString>
+    </metadataStandardName>
+    <metadataStandardVersion>
+        <gco:CharacterString>2007</gco:CharacterString>
+    </metadataStandardVersion>
+    <identificationInfo>
+        <MD_DataIdentification>
+            <citation gco:nilReason="missing"/>
+            <abstract>
+                <gco:CharacterString>GTFS is a feed specification that allows public transportation agencies to provide updates about their fleet to application developers.We pass our data through Google's Transit Feed Validator at the error level, but the data may have warnings left unfixed in order for it to conform to TransLink's business rules, like &amp;quot;duplicate stops&amp;quot; with no distance between them.We have a minimum of four transit schedule changes per year, and our files are updated two weeks prior to the changes.TransLink posts a new static GTFS data file every Friday afternoon, but our data might change more frequently. For the most up-to-date transit schedule information, check out our Bus Schedules or Trip Planner.</gco:CharacterString>
+            </abstract>
+            <purpose>
+                <gco:CharacterString>TransLink General Transit Feed Specification (GTFS) Data.</gco:CharacterString>
+            </purpose>
+            <descriptiveKeywords>
+                <MD_Keywords>
+                    <keyword>
+                        <gco:CharacterString>TransLink</gco:CharacterString>
+                    </keyword>
+                    <keyword>
+                        <gco:CharacterString>GTFS</gco:CharacterString>
+                    </keyword>
+                    <keyword>
+                        <gco:CharacterString>transportation</gco:CharacterString>
+                    </keyword>
+                </MD_Keywords>
+            </descriptiveKeywords>
+            <descriptiveKeywords>
+                <MD_Keywords>
+                    <keyword>
+                        <gco:CharacterString>TransLink</gco:CharacterString>
+                    </keyword>
+                    <keyword>
+                        <gco:CharacterString>GTFS</gco:CharacterString>
+                    </keyword>
+                    <keyword>
+                        <gco:CharacterString>transportation</gco:CharacterString>
+                    </keyword>
+                </MD_Keywords>
+            </descriptiveKeywords>
+            <descriptiveKeywords>
+                <MD_Keywords>
+                    <keyword>
+                        <gco:CharacterString>TransLink</gco:CharacterString>
+                    </keyword>
+                    <keyword>
+                        <gco:CharacterString>GTFS</gco:CharacterString>
+                    </keyword>
+                    <keyword>
+                        <gco:CharacterString>transportation</gco:CharacterString>
+                    </keyword>
+                </MD_Keywords>
+            </descriptiveKeywords>
+            <resourceConstraints>
+                <MD_Constraints>
+                    <useLimitation>
+                        <gco:CharacterString>These Terms of Use set out the terms and conditions &amp;quot;the Terms&amp;quot; which governs your use of TransLink's General Transit Feed Specification (GTFS) Data (the &amp;quot;Data&amp;quot;).You must provide TransLink sufficient information as TransLink may request to identify you, your organization or company, who will be using the Data, where it will be distributed and whether the use of the data is for non-commercial or commercial purposes. TransLink reserves the right to impose conditions or restrictions on your use of the Data.In consideration of TransLink providing you with a copy of the Data, you are deemed to accept and agree to the following Terms:TransLink retains all right, title, and interest in the Data, and any intellectual property rights embodied in the Data, including any copyright, and any and all improvements or modifications to the Data and that you acquire no such proprietary rights from the use or distribution of the Data, and that you will not attempt to restrict, limit or prevent TransLink's use of the Data or TransLink's trade-marks or official marks in association with the Data.TransLink grants you a limited, revocable and non-exclusive license to use, reproduce, and redistribute the Data in accordance with these Terms.In the event you are a commercial user and you charge an end user a direct or indirect fee to use the Data, TransLink reserves the right to impose additional terms and conditions for use of the Data, including, but not limited to requiring you to pay a fee or other compensation for the use of the Data.You must, unless otherwise agreed to by TransLink in writing, at all times present and identify the Data with the following legend, prominently displayed: &amp;quot;Route and arrival data used in this product or service is provided by permission of TransLink. TransLink assumes no responsibility for the accuracy or currency of the Data used in this product or service.&amp;quot; (&amp;quot;The Legend&amp;quot;). Other than displaying the Legend, you are not authorized and are prohibited from, making use of TransLink's domain name or any trade-marks or official marks, which are owned by TransLink or any confusingly similar variation of the domain name or those marks.The Data is provided to you on &amp;quot;as is&amp;quot; and &amp;quot;as available&amp;quot; basis, without any express or implied warranty of any kind, including without limitation, the implied warranties of merchantability, fitness for a particular purpose, accuracy and non-infringement. Under no circumstances will TransLink be liable for any direct or indirect damages, even if TransLink is aware of the possibility of such damages, including without limitation damages, loss of profits or for any other special, economic loss, consequential, exemplary or incidental damages, however caused, whether based upon contract, including negligence, strict liability in tort, warranty or contractual claims, or any other legal theory, arising out of or related to your use of the Data. You agree with TransLink that this limitation should apply even if it the Data, is faulty or inaccurate or otherwise fails. You agree that the use of the Data is at your own risk, and you assume the risk that the Data may provide incorrect information to you or your users, as well as the risk that the Data may cause loss of data or damage to your computer system.You agree to indemnify, defend and hold harmless TransLink and its officers, directors, employees, and agents from and against all demands, claims, causes of action, suits, actions or proceedings, or liabilities of any kind or of any nature arising out of or in connection with your use or distribution of the Data to any end user.These Terms sets forth the entire agreement between you and TransLink and supersedes all previous discussions, representations and agreements between you and TransLink, whether written or oral, and may be amended only with the written consent of TransLink.</gco:CharacterString>
+                    </useLimitation>
+                </MD_Constraints>
+            </resourceConstraints>
+            <language gco:nilReason="missing"/>
+            <characterSet>
+                <MD_CharacterSetCode codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_CharacterSetCode" codeListValue="utf8" codeSpace="ISOTC211/19115">utf8</MD_CharacterSetCode>
+            </characterSet>
+        </MD_DataIdentification>
+    </identificationInfo>
+</MD_Metadata>

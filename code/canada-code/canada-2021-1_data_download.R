@@ -5,7 +5,7 @@ options(cancensus.api_key = "CensusMapper_0b92e5c233577930002b12a0e9d2d7d9")
 # run this file like like: Rscript data_download CityName RegionLevel Year
 # example: Rscript data_download.R Vancouver CT 1996
 args = commandArgs(trailingOnly=TRUE)
-city_args = c("Vancouver", "CT")
+city_args = c("Toronto", "CT")
 
 if (args[1] == "Vancouver") {
   CMA_UID = "59933"
@@ -68,9 +68,9 @@ if (args[3] == "1996") {
                       "v_CA1996_1623", # 80k - 89,999
                       "v_CA1996_1624", # 90k - 99,999
                       "v_CA1996_1625", # 100k and up
-                      
-                      "v_CA1996_1627", # median household income
-                      
+                      "v_CA1996_1626", # Average household income $
+                      "v_CA1996_1627", # Median household income $
+                      "v_CA1996_1628", # Standard error of average household income $
                       "v_CA1996_1701", # average gross rent
                       "v_CA1996_1702", # Gross rent spending  30% or more of household income on shelter costs
                       "v_CA1996_1704",  # average owner's major payments
@@ -131,7 +131,8 @@ if (args[3] == "1996") {
                       "v_CA06_1998", # 90k - 99,999
                       "v_CA06_1999", # above 100k
                       "v_CA06_2000", # median household income
-                      
+                      "v_CA06_2001", # Average household income $
+                      "v_CA06_2002", # Standard error of average household income $
                       "v_CA06_2048", # Total number of non-farm, non-reserve private dwellings occupied by usual residents
                       "v_CA06_2049", # renters
                       "v_CA06_2050", # avg gross rent
@@ -139,16 +140,22 @@ if (args[3] == "1996") {
                       "v_CA06_2053", # owners
                       "v_CA06_2054", # Average value of dwelling $
                       "v_CA06_2055", # Average owner major payments $
-                      "v_CA06_2056" # Owner households spending 30% or more of household income on owner's major payments
+                      "v_CA06_2056"  # Owner households spending 30% or more of household income on owner's major payments
   )
   
 } else if (args[3] == "2011") {
   dataset_var = "CA11"
   census_vecs <- c("v_CA11N_2281", # Number of owner households in non-farm, non-reserve private dwellings
+                   "v_CA11N_2282", # % of owner households with a mortgage
                    "v_CA11N_2288", # Number of tenant households in non-farm, non-reserve private dwellings
+                   "v_CA11N_2289", # % of tenant households in subsidized housing
                    "v_CA11N_2284", # Median monthly shelter costs for owned dwellings ($)
                    "v_CA11N_2286", # Median value of dwellings ($)
-                   "v_CA11N_2291" # Median monthly shelter costs for rented dwellings ($)
+                   "v_CA11N_2291", # Median monthly shelter costs for rented dwellings ($)
+                   "v_CA11N_2285", # Average monthly shelter costs for owned dwellings ($)
+                   "v_CA11N_2287", # Average value of dwellings ($)
+                   "v_CA11N_2292"  # Average monthly shelter costs for rented dwellings ($)
+
                    )
   
   
@@ -177,7 +184,7 @@ if (args[3] == "1996") {
                       "v_CA16_2423", # 100k and over - 125 to 149,999
                       "v_CA16_2424", # 100k and over - 150k to 199,999
                       "v_CA16_2425", # 100k and over - 200k and over
-                      
+                      "v_CA16_2510", # Total - Low-income status in 2015 for the population in private households to whom low-income concepts are applicable - 100% data
                       "v_CA16_3954", # Total - Visible minority for the population in private households - 25% sample data
                       "v_CA16_3957", # Total visible minority population
                       
@@ -200,7 +207,7 @@ if (args[3] == "1996") {
                       "v_CA16_4899", # % of tenant households spending 30% or more of its income on shelter costs
                       "v_CA16_4900", # median monthly shelter costs - renters
                       "v_CA16_4901", # Average monthly shelter costs for rented dwellings ($)
-                      
+                      "v_CA16_4985", # Average total income of households in 2015 ($)
                       "v_CA16_5051", # uni educated households denom
                       
                       "v_CA16_5105", # uni educated households
@@ -218,7 +225,6 @@ if (args[3] == "1996") {
   print("The year is not ready to be downloaded.")
 }
 
-
 # just use this to get the vector names
 # census_labels <- list_census_vectors("CA11")
 # write.csv(census_labels, "CA11_labels.csv")
@@ -230,8 +236,6 @@ census_data <- get_census(dataset = dataset_var, regions = list(CMA = CMA_UID),
 substrRight <- function(x, n){
   substr(x, nchar(x)-n+1, nchar(x))
 }
-
-
 
 write.csv(census_data, paste("E:\\forked_canada_udp/data/outputs/downloads/", as.character(city_name), substrRight(as.character(dataset_var), 2), as.character(level_var), "data.csv", sep = "_"))
 

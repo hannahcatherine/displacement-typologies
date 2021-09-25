@@ -1,0 +1,10 @@
+{
+  "version": "0.2.1",
+  "tasks": [
+    {
+      "taskLabel": "task-canada-2021-2_data_curation",
+      "appliesTo": "code/canada-code/canada-2021-2_data_curation.py",
+      "type": "launch"
+    }
+  ]
+}

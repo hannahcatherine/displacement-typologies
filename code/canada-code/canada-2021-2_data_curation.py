@@ -87,6 +87,8 @@ xwalk_ctuid_source = "ctuid_s"
 xwalk_ctuid_target = "ctuid_t"
 
 counts96 = census_96.columns.drop(["GeoUID", "Type", "Region Name", "Area (sq km)", "CMA_UID", "PR_UID", "CSD_UID", "CD_UID", 
+                                 "v_CA1996_1626: Average household income $",
+                                 "v_CA1996_1628: Standard error of average household income $",
                                  "v_CA1996_1627: Median household income $",
                                  "v_CA1996_1701: Average gross rent $",
                                  "v_CA1996_1704: Average owner's major payments $",
@@ -99,6 +101,8 @@ census_96_xwalked = crosswalk_files(census_96, xwalk_96_16, counts96, df_ctuid_s
 ## 2006 Census Data
 counts06 = census_06.columns.drop(["GeoUID", "Type", "Region Name", "Area (sq km)", "CMA_UID", "PR_UID", "CSD_UID", "CD_UID", 
                                  "v_CA06_2000: Median household income $", 
+                                 "v_CA06_2001: Average household income $",
+                                 "v_CA06_2002: Standard error of average household income $",
                                  "v_CA06_2054: Average value of dwelling $", 
                                  "v_CA06_2050: Average gross rent $", 
                                  "v_CA06_2055: Average owner major payments $",
@@ -107,11 +111,12 @@ census_06_xwalked = crosswalk_files(census_06, xwalk_06_16, counts06, df_ctuid_s
 
 # 2011 Census Data
 counts11 = census_11.columns.drop(["GeoUID", "Type", "Region Name", "Area (sq km)", "CMA_UID", "PR_UID", "CSD_UID", "CD_UID", 
+                                 "v_CA11N_2285: Average monthly shelter costs for owned dwellings ($)",
+                                 "v_CA11N_2292: Average monthly shelter costs for rented dwellings ($)",
+                                 "v_CA11N_2287: Average value of dwellings ($)",
                                  "v_CA11N_2284: Median monthly shelter costs for owned dwellings ($)", 
                                  "v_CA11N_2286: Median value of dwellings ($)"])
 census_11_xwalked = crosswalk_files(census_11, xwalk_11_16, counts11, df_ctuid_source, xwalk_ctuid_source, xwalk_ctuid_target )
-
-
 
 
 # ==========================================================================
@@ -123,28 +128,10 @@ census_11_xwalked = crosswalk_files(census_11, xwalk_11_16, counts11, df_ctuid_s
 # ==========================================================================
 
 # ==========================================================================
-# Setup / Read Files (inputs needed)
-# ==========================================================================
-# Note: Below is the Google File Drive Stream pathway for a Mac. 
-# input_path = "~/git/displacement-typologies/data/inputs/"
-# Use this to draw in the "input_path" variable needed below
-# You will need to redesignate this path if you have a Windows 
-# output_path = output_path
 
-shp_folder = input_path+"shp/"+str.lower(city_name)+"/"
 data_1996 = census_96_xwalked
 data_2006 = census_06_xwalked
 data_2011 = census_11_xwalked
-
-# ==========================================================================
-# Read Shapefile Data (inputs needed)
-# ==========================================================================
-# Note: Similar to above, add a "elif" for you city here
-# Pull cartographic boundary files from here: 
-# (this link is for the entirety of Canada, the files in the shp folder have already been filtered by city)
-# https://www12.statcan.gc.ca/census-recensement/2011/geo/bound-limit/bound-limit-2016-eng.cfm
-
-city_shp = gpd.read_file(shp_folder+str.lower(city_name) + ".shp")
 
 # ==========================================================================
 # Income Interpolation
@@ -154,34 +141,49 @@ city_shp = gpd.read_file(shp_folder+str.lower(city_name) + ".shp")
 # --------------------------------------------------------------------------
 data_1996 = data_1996.rename(columns = {"Population" : "pop_96",
                                   "Dwellings" : "dwellings_96",
-                                  "Households" : "hh_96"})
+                                  "Households" : "hh_96",
+                                  "Area (sq km)" : "area_96"
+                                  })
 data_2006 = data_2006.rename(columns = {"Population" : "pop_06",
                                   "Dwellings" : "dwellings_06",
-                                  "Households" : "hh_06"})
+                                  "Households" : "hh_06",
+                                  "Area (sq km)" : "area_06"
+                                  })
 data_2011 = data_2011.rename(columns = {"Population" : "pop_11",
                                   "Dwellings" : "dwellings_11",
-                                  "Households" : "hh_11",})
+                                  "Households" : "hh_11",
+                                  "Area (sq km)" : "area_11"
+                                  })
 
 census_16 = census_16.rename(columns = {"Population" : "pop_16",
                                   "Dwellings" : "dwellings_16",
-                                  "Households" : "hh_16"})
+                                  "Households" : "hh_16",
+                                  "Area (sq km)" : "area_16"
+                                  })
 
 all_census = census_16.merge(data_2011, left_on = "GeoUID", right_on = "GeoUID", how = "outer").merge(data_2006, left_on = "GeoUID", right_on = "GeoUID", how = "outer").merge(data_1996, on = "GeoUID", how = "outer")
 
-# rename variables to be consistent with vast majority of this file
 cma_96 = cma_96.rename(columns = {"Population" : "pop_96",
                                   "Dwellings" : "dwellings_96",
-                                  "Households" : "hh_96"})
+                                  "Households" : "hh_96",
+                                  "Area (sq km)" : "area_96"
+                                  })
 cma_06 = cma_06.rename(columns = {"Population" : "pop_06",
                                   "Dwellings" : "dwellings_06",
-                                  "Households" : "hh_06"})
+                                  "Households" : "hh_06",
+                                  "Area (sq km)" : "area_06"
+                                  })
 cma_11 = cma_11.rename(columns = {"Population" : "pop_11",
                                   "Dwellings" : "dwellings_11",
-                                  "Households" : "hh_11"})
+                                  "Households" : "hh_11",
+                                  "Area (sq km)" : "area_11"
+                                  })
 
 cma_16 = cma_16.rename(columns = {"Population" : "pop_16",
                                   "Dwellings" : "dwellings_16",
-                                  "Households" : "hh_16"})
+                                  "Households" : "hh_16",
+                                  "Area (sq km)" : "area_16"
+                                  })
 
 all_cma = cma_16.merge(cma_11, on = "GeoUID", how = "outer").merge(cma_06, on = "GeoUID", how = "outer").merge(cma_96, on = "GeoUID", how = "outer")
 
@@ -192,11 +194,15 @@ rename_all_cols = {
                              "v_CA06_2000: Median household income $":"mhhinc_06",
                              "v_CA16_2397: Median total income of households in 2015 ($)":"mhhinc_16",
 
-                             # Median individual income
-                             "v_CA1996_1454: Median income $":"miinc_96",
-                             "v_CA06_1583: Median income $":"miinc_06",
-                             "v_CA16_2207: Median total income in 2015 among recipients ($)":"miinc_16",
+                             # Average HH income
+                             "v_CA1996_1626: Average household income $":"avghhinc_96",
+                             "v_CA06_2001: Average household income $":"avghhinc_06",
+                             "v_CA16_4985: Average total income of households in 2015 ($)":"avghhinc_16",
 
+                             # Standard Error for average HH income
+                             "v_CA1996_1628: Standard error of average household income $":"stderr_avghhinc_96",
+                             "v_CA06_2002: Standard error of average household income $" : "stderr_avghhinc_06",
+                    
                              # Household income of all private households (20% sample data)
                              "v_CA1996_1614: Household income of all private households":"income_denom_96",
                              "v_CA06_1988: Household income in 2005 of private households - 20% sample data":"income_denom_06",
@@ -205,18 +211,19 @@ rename_all_cols = {
                              # Average value of dwellings
                              "v_CA1996_1681: Average value of dwelling $":"avghval_96",
                              "v_CA06_2054: Average value of dwelling $":"avghval_06",
+                             "v_CA11N_2287: Average value of dwellings ($)":"avghval_11",
                              "v_CA16_4896: Average value of dwellings ($)":"avghval_16",
 
                              # median value of dwellings
                              "v_CA11N_2286: Median value of dwellings ($)" : "mhval_11",
                              "v_CA16_4895: Median value of dwellings ($)":"mhval_16",
 
-                             # Median monthly shelter costs for rented/owned dwellings:
+                             # Median monthly shelter costs for owned/rented dwellings:
                              "v_CA11N_2284: Median monthly shelter costs for owned dwellings ($)" : "mhcosts_o_11",
                              "v_CA11N_2291: Median monthly shelter costs for rented dwellings ($)" : "mhcosts_r_11",
-                             "v_CA16_4900: Median monthly shelter costs for rented dwellings ($)" : "mhcosts_r_16",
                              "v_CA16_4893: Median monthly shelter costs for owned dwellings ($)" : "mhcosts_o_16",
-                         
+                             "v_CA16_4900: Median monthly shelter costs for rented dwellings ($)" : "mhcosts_r_16",
+                             
                              # Total visible minority population
                              "v_CA1996_784: Total visible minority population":"visible_minority_96",
                              "v_CA06_1303: Total visible minority population":"visible_minority_06",
@@ -242,7 +249,8 @@ rename_all_cols = {
                              "v_CA16_4837: Owner":"ohu_16",
 
                              # population over 15, reporting education
-                             # the 
+                             # this has to be used instead of 25 and up, because 1996 doesn't have data by age group, only 15+
+                             # use these as denominators for reported education
                              "v_CA1996_1347: Total population 15 years and over by highest level of schooling" : "tot_15_edu_96",
                              "v_CA06_1234: Total population 15 to 24 years by highest certificate, diploma or degree - 20% sample data" : "tot_15_24_edu_06",
                              "v_CA06_1248: Total population 25 to 64 years by highest certificate, diploma or degree - 20% sample data" : "tot_25_64_edu_06",
@@ -262,12 +270,14 @@ rename_all_cols = {
                              # average monthly shelter costs for owned dwellings ($)
                              "v_CA1996_1704: Average owner's major payments $":"avg_o_shelter_96",
                              "v_CA06_2055: Average owner major payments $" : "avg_o_shelter_06",
+                             "v_CA11N_2285: Average monthly shelter costs for owned dwellings ($)": "avg_o_shelter_11",
                              "v_CA16_4894: Average monthly shelter costs for owned dwellings ($)":"avg_o_shelter_16",
 
                              # average monthly shelter costs for rented dwellings ($)
-                             "v_CA1996_1701: Average gross rent $":"avgrent_96",
-                             "v_CA06_2050: Average gross rent $" : "avgrent_06",
-                             "v_CA16_4901: Average monthly shelter costs for rented dwellings ($)":"avgrent_16",
+                             "v_CA1996_1701: Average gross rent $":"avg_r_shelter_96",
+                             "v_CA06_2050: Average gross rent $" : "avg_r_shelter_06",
+                             "v_CA11N_2292: Average monthly shelter costs for rented dwellings ($)":"avg_r_shelter_11",
+                             "v_CA16_4901: Average monthly shelter costs for rented dwellings ($)":"avg_r_shelter_16",
 
                              # total visible minority population by group
                              "v_CA06_1302: Total population by visible minority groups - 20% sample data":"visible_minority_group_06",
@@ -281,6 +291,11 @@ rename_all_cols = {
                              # owner one fam HH spending >30% or more of HH income on shelter
                              "v_CA06_2063: Owner one-family households without additional persons spending 30% or more of household income on shelter costs" : "owner_one_family_30_pct_06",
                              
+                             # % of renters in subsidized housing
+                             "v_CA16_4898: % of tenant households in subsidized housing" : "subsidized_16",
+                             # % of owners with a mortgage
+                             "v_CA16_4891: % of owner households with a mortgage" : "mortgage_16",
+
                              # mobility status 1 year ago:
                              "v_CA1996_1385: Total by mobility status 1 year ago" : "total_mob_96",
                              "v_CA1996_1387: Movers" : "movers_96",
@@ -343,22 +358,23 @@ rename_all_cols = {
                              "v_CA16_2425: $200,000 and over":"I_200100_16",
                              }
 
-
-
 all_census = all_census.rename(columns = rename_all_cols)
 
 all_cma = all_cma.rename(columns = rename_all_cols)
 
-all_cma.to_csv("with_colnames.csv")
+# exclude non-significant tracts
+all_census["significant"] = abs((all_census["avghhinc_06"] - all_census["avghhinc_96"]) / np.sqrt(all_census["stderr_avghhinc_06"] ** 2 - all_census["stderr_avghhinc_06"] ** 2)) > 1.96
+
+all_census = all_census[all_census["significant"]]
 ## CPI indexing values
 
 # downloaded from here: https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=1810000501&pickMembers%5B0%5D=1.27&cubeTimeFrame.startYear=1995&cubeTimeFrame.endYear=2016&referencePeriods=19950101%2C20160101
 # the 0 index is all, 1 is shelter
 
-CPI = pd.read_csv("data/inputs/CPI_vancouver.csv")
-CPI_95_16 = (CPI["2016"] - CPI["1995"])[1] / (2016 - 1995)
-CPI_10_16 = (CPI["2016"] - CPI["2010"])[1] / (2016 - 2010)
-CPI_05_16 = (CPI["2016"] - CPI["2005"])[1] / (2016 - 2005)
+CPI = pd.read_csv("data/inputs/CPI_" +str.lower(city_name)+ ".csv")
+CPI_95_16 = CPI["2016"][1] / CPI["1995"][1] # 1.19
+CPI_05_16 = CPI["2016"][1] / CPI["2005"][1] # 1.14
+CPI_10_16 = CPI["2016"][1] / CPI["2010"][1] # 1.04
 
 
 # Income Interpolation
@@ -368,19 +384,39 @@ all_census["mhhinc_96"][all_census["mhhinc_96"]<0]=np.nan
 all_census["mhhinc_06"][all_census["mhhinc_06"]<0]=np.nan
 all_census["mhhinc_16"][all_census["mhhinc_16"]<0]=np.nan
 
+all_census["avghhinc_96"][all_census["avghhinc_96"]<0]=np.nan
+all_census["avghhinc_06"][all_census["avghhinc_06"]<0]=np.nan
+all_census["avghhinc_16"][all_census["avghhinc_16"]<0]=np.nan
+
 # regional median income : use CMA data
+
 rm_hhinc_96 = np.nanmedian(all_cma["mhhinc_96"])
 rm_hhinc_06 = np.nanmedian(all_cma["mhhinc_06"])
 rm_hhinc_16 = np.nanmedian(all_cma["mhhinc_16"])
-rm_iinc_96 = np.nanmedian(all_cma["miinc_96"])
-rm_iinc_06 = np.nanmedian(all_cma["miinc_06"])
-rm_iinc_16 = np.nanmedian(all_cma["miinc_16"])
 
-print(rm_hhinc_16, rm_hhinc_06, rm_hhinc_96, rm_iinc_16, rm_iinc_06, rm_iinc_96)
+all_census["rm_hhinc_96"] = rm_hhinc_96
+all_census["rm_hhinc_06"] = rm_hhinc_06
+all_census["rm_hhinc_16"] = rm_hhinc_16
+
+# regional average income : use CMA data
+ravg_hhinc_96 = np.nanmean(all_cma["avghhinc_96"])
+ravg_hhinc_06 = np.nanmean(all_cma["avghhinc_06"])
+ravg_hhinc_16 = np.nanmean(all_cma["avghhinc_16"])
+
+all_census["ravg_hhinc_96"] = ravg_hhinc_96
+all_census["ravg_hhinc_06"] = ravg_hhinc_06
+all_census["ravg_hhinc_16"] = ravg_hhinc_16
+
+print("Regional median household income for 1996:", rm_hhinc_96, "\n",
+      "Regional median household income for 2006:", rm_hhinc_06, "\n",
+      "Regional median household income for 2016:", rm_hhinc_16, "\n",
+      "Regional average household income for 1996:", ravg_hhinc_96, "\n",
+      "Regional average household income for 2006:", ravg_hhinc_06, "\n",
+      "Regional average household income for 2016:", ravg_hhinc_16, "\n")
 
 ## Income Interpolation Function 
 ## This function interpolates population counts using income buckets provided by the Census
-def income_interpolation (census_df, year, cutoff, minc, tot_var, var_suffix, out):
+def income_interpolation (census_df, year, cutoff, inc, tot_var, var_suffix, out):
 
     """
         census_df : the all_census dataframe
@@ -408,7 +444,7 @@ def income_interpolation (census_df, year, cutoff, minc, tot_var, var_suffix, ou
     for i in number:
         column.append("prop_"+str(i))
         income_cat["prop_"+str(i)] = income_cat[var_suffix+"_"+str(i)+"_"+year]/income_cat[tot_var]          
-    reg_avg_cutoff = cutoff*minc
+    reg_avg_cutoff = cutoff*inc
     cumulative = out+str(int(cutoff*100))+"_cumulative"
     income = out+str(int(cutoff*100))+"_"+year 
     df = income_cat
@@ -433,22 +469,32 @@ def income_interpolation (census_df, year, cutoff, minc, tot_var, var_suffix, ou
     return census_df
 
 # some census tracts don"t add up to 100% by category because their total # of households is +/- 10-15 off of the summed brackets
+income_80_120 = [.8, 1.2]
 
+# using regional median hh income
+all_census = income_interpolation(all_census, "16", 0.8, rm_hhinc_16, "income_denom_16", "I", "inc")
+all_census = income_interpolation(all_census, "16", 1.2, rm_hhinc_16, "income_denom_16", "I", "inc")
+all_census = income_interpolation(all_census, "16", 1.8, rm_hhinc_16, "income_denom_16", "I", "inc")
 
-all_census = income_interpolation (all_census, "16", 0.8, rm_hhinc_16, "income_denom_16", "I", "inc")
-all_census = income_interpolation (all_census, "16", 1.2, rm_hhinc_16, "income_denom_16", "I", "inc")
 all_census = income_interpolation (all_census, "06", 0.8, rm_hhinc_06, "income_denom_06", "I", "inc")
 all_census = income_interpolation (all_census, "06", 1.2, rm_hhinc_06, "income_denom_06", "I", "inc")
+all_census = income_interpolation (all_census, "06", 1.8, rm_hhinc_06, "income_denom_06", "I", "inc")
+
 all_census = income_interpolation (all_census, "96", 0.8, rm_hhinc_96, "income_denom_96", "I", "inc")
 all_census = income_interpolation (all_census, "96", 1.2, rm_hhinc_96, "income_denom_96", "I", "inc")
+all_census = income_interpolation (all_census, "96", 1.8, rm_hhinc_96, "income_denom_96", "I", "inc")
 
 all_cma = income_interpolation (all_cma, "16", 0.8, rm_hhinc_16, "income_denom_16", "I", "inc")
 all_cma = income_interpolation (all_cma, "16", 1.2, rm_hhinc_16, "income_denom_16", "I", "inc")
+all_cma = income_interpolation (all_cma, "16", 1.8, rm_hhinc_16, "income_denom_16", "I", "inc")
+
 all_cma = income_interpolation (all_cma, "06", 0.8, rm_hhinc_06, "income_denom_06", "I", "inc")
 all_cma = income_interpolation (all_cma, "06", 1.2, rm_hhinc_06, "income_denom_06", "I", "inc")
+all_cma = income_interpolation (all_cma, "06", 1.8, rm_hhinc_06, "income_denom_06", "I", "inc")
+
 all_cma = income_interpolation (all_cma, "96", 0.8, rm_hhinc_96, "income_denom_96", "I", "inc")
 all_cma = income_interpolation (all_cma, "96", 1.2, rm_hhinc_96, "income_denom_96", "I", "inc")
-
+all_cma = income_interpolation (all_cma, "96", 1.8, rm_hhinc_96, "income_denom_96", "I", "inc")
 
 income_col = all_census.columns[all_census.columns.str[0:2]=="I_"] 
 all_census = all_census.drop(columns = income_col)
@@ -461,22 +507,26 @@ all_cma = all_cma.drop(columns = income_col_cma)
 # Generate Income Categories 
 # ==========================================================================
 
-def income_categories (df, year, minc, hinc, geog):
+def income_categories (df, year, mhhinc, hinc, geog):
     df["mhhinc_"+year] = np.where(df["mhhinc_"+year]<0, 0, df["mhhinc_"+year])  
-    reg_med_inc80 = 0.8 * minc
-    reg_med_inc120 = 1.2 * minc
+    reg_med_inc80 = 0.8 * mhhinc
+    reg_med_inc120 = 1.2 * mhhinc
     low = "low_80120_" + year 
     mod = "mod_80120_" + year
     high = "high_80120_" + year
+    VHI = "VHI_180_" + year
     df[low] = df["inc80_" + year]
     df[mod] = df["inc120_" + year] - df["inc80_" + year]
     df[high] = 1 - df["inc120_" + year]  
+    df[VHI] = 1 - df["inc180_" + year] 
     ## Low income
     df["low_pdmt_medhhinc_"+year] = np.where((df["low_80120_"+year]>=0.55)&(df["mod_80120_"+year]<0.45)&(df["high_80120_"+year]<0.45),1,0)
     ## High income
     df["high_pdmt_medhhinc_"+year] = np.where((df["low_80120_"+year]<0.45)&(df["mod_80120_"+year]<0.45)&(df["high_80120_"+year]>=0.55),1,0)
     ## Moderate income
     df["mod_pdmt_medhhinc_"+year] = np.where((df["low_80120_"+year]<0.45)&(df["mod_80120_"+year]>=0.55)&(df["high_80120_"+year]<0.45),1,0)
+    ## Very High income
+    df["VHI_pdmt_medhhinc_"+year] = np.where((df["low_80120_"+year]<0.45)&(df["mod_80120_"+year]<0.45)&(df["VHI_180_"+year]>=0.55),1,0)
     ## Mixed-Low income
     df["mix_low_medhhinc_"+year] = np.where((df["low_pdmt_medhhinc_"+year]==0)&
                                                   (df["mod_pdmt_medhhinc_"+year]==0)&
@@ -499,7 +549,8 @@ def income_categories (df, year, minc, hinc, geog):
     df.loc[df["mod_pdmt_medhhinc_"+year]==1, "inc_cat_medhhinc_"+year] = 3
     df.loc[df["mix_mod_medhhinc_"+year]==1, "inc_cat_medhhinc_"+year] = 4
     df.loc[df["mix_high_medhhinc_"+year]==1, "inc_cat_medhhinc_"+year] = 5
-    df.loc[df["high_pdmt_medhhinc_"+year]==1, "inc_cat_medhhinc_"+year] = 6    
+    df.loc[df["high_pdmt_medhhinc_"+year]==1, "inc_cat_medhhinc_"+year] = 6 
+    df.loc[df["VHI_pdmt_medhhinc_"+year]==1, "inc_cat_medhhinc_"+year] = 7 
     df["inc_cat_medhhinc_encoded"+year] = 0
     df.loc[df["low_pdmt_medhhinc_"+year]==1, "inc_cat_medhhinc_encoded"+year] = "low_pdmt"
     df.loc[df["mix_low_medhhinc_"+year]==1, "inc_cat_medhhinc_encoded"+year] = "mix_low"
@@ -507,6 +558,7 @@ def income_categories (df, year, minc, hinc, geog):
     df.loc[df["mix_mod_medhhinc_"+year]==1, "inc_cat_medhhinc_encoded"+year] = "mix_mod"
     df.loc[df["mix_high_medhhinc_"+year]==1, "inc_cat_medhhinc_encoded"+year] = "mix_high"
     df.loc[df["high_pdmt_medhhinc_"+year]==1, "inc_cat_medhhinc_encoded"+year] = "high_pdmt"
+    df.loc[df["VHI_pdmt_medhhinc_"+year]==1, "inc_cat_medhhinc_encoded"+year] = "VHI_pdmt"
     df.loc[df["mhhinc_"+year]==0, "low_pdmt_medhhinc_"+year] = np.nan
     df.loc[df["mhhinc_"+year]==0, "mix_low_medhhinc_"+year] = np.nan
     df.loc[df["mhhinc_"+year]==0, "mod_pdmt_medhhinc_"+year] = np.nan
@@ -529,10 +581,6 @@ all_cma = income_categories(all_cma, "16", rm_hhinc_16, "mhhinc_16", "cma")
 all_cma = income_categories(all_cma, "06", rm_hhinc_06, "mhhinc_06", "cma")
 all_cma = income_categories(all_cma, "96", rm_hhinc_96, "mhhinc_96", "cma")
 
-
-all_census.groupby("inc_cat_medhhinc_06").count()["GeoUID"]
-all_census.groupby("inc_cat_medhhinc_16").count()["GeoUID"]
-
 ## Percentage of low-income households - under 80% AMI
 all_census ["per_all_li_96"] = all_census["inc80_96"]
 all_census ["per_all_li_06"] = all_census["inc80_06"]
@@ -550,6 +598,91 @@ all_cma["all_li_count_06"] = all_cma["per_all_li_06"] * all_cma["income_denom_06
 all_cma["all_li_count_16"] = all_cma["per_all_li_16"] * all_cma["income_denom_16"]
 
 len(all_census)
+# ==========================================================================
+# Demographic Data 
+# ==========================================================================
+
+df = all_census
+
+# --------------------------------------------------------------------------
+## 1996
+df["per_visible_minority_96"] = df["visible_minority_96"]/df["pop_96"]
+all_cma["per_visible_minority_96"] = all_cma["visible_minority_96"]/all_cma["pop_96"]
+
+## 2006
+df["per_visible_minority_06"] = df["visible_minority_06"]/df["pop_06"]
+all_cma["per_visible_minority_06"] = all_cma["visible_minority_06"]/all_cma["pop_06"]
+
+## 2016
+df["per_visible_minority_16"] = df["visible_minority_16"]/df["pop_16"]
+all_cma["per_visible_minority_16"] = all_cma["visible_minority_16"]/all_cma["pop_16"]
+
+# % of owner and renter-occupied housing units
+# --------------------------------------------------------------------------
+
+# housing units, percentage of renters 
+## 1996
+df["hu_96"] = df["ohu_96"] + df["rhu_96"]
+df["per_rent_96"] = df["rhu_96"] / df["hu_96"]
+df["per_own_96"] = df["ohu_96"] / df["hu_96"]
+all_cma["hu_96"] = all_cma["ohu_96"] + all_cma["rhu_96"]
+all_cma["per_rent_96"] = all_cma["rhu_96"] / all_cma["hu_96"]
+all_cma["per_own_96"] = all_cma["ohu_96"] / all_cma["hu_96"]
+
+## 2006
+df["hu_06"] = df["ohu_06"] + df["rhu_06"]
+df["per_rent_06"] = df["rhu_06"] / df["hu_06"]
+df["per_own_06"] = df["ohu_06"] / df["hu_06"]
+all_cma["hu_06"] = all_cma["ohu_06"] + all_cma["rhu_06"]
+all_cma["per_rent_06"] = all_cma["rhu_06"] / all_cma["hu_06"]
+all_cma["per_own_06"] = all_cma["ohu_06"] / all_cma["hu_06"]
+
+## 2011
+df["hu_11"] = df["ohu_11"] + df["rhu_11"]
+df["per_rent_11"] = df["rhu_11"] / df["hu_11"]
+df["per_own_11"] = df["ohu_11"] / df["hu_11"]
+all_cma["hu_11"] = all_cma["ohu_11"] + all_cma["rhu_11"]
+all_cma["per_rent_11"] = all_cma["rhu_11"] / all_cma["hu_11"]
+all_cma["per_own_11"] = all_cma["ohu_11"] / all_cma["hu_11"]
+
+## 2016
+df["hu_16"] = df["ohu_16"] + df["rhu_16"]
+df["per_rent_16"] = df["rhu_16"] / df["hu_16"]
+df["per_own_16"] = df["ohu_16"] / df["hu_16"]
+all_cma["hu_16"] = all_cma["ohu_16"] + all_cma["rhu_16"]
+all_cma["per_rent_16"] = all_cma["rhu_16"] / all_cma["hu_16"]
+all_cma["per_own_16"] = all_cma["ohu_16"] / all_cma["hu_16"]
+
+
+# percent of homeowners *without* a mortgage in 2016
+all_census["per_no_mortgage_16"] = all_census["ohu_16"] * (1  - all_census["mortgage_16"] / 100)
+
+# % of uni educated HHs / over 15 reporting education == percent_college_educated
+# --------------------------------------------------------------------------
+
+# 1996
+df["per_col_96"] = df["uni_hh_96"] / df["tot_15_edu_96"]
+all_cma["per_col_96"] = all_cma["uni_hh_96"] / all_cma["tot_15_edu_96"]
+
+## 2006
+df["tot_15_edu_06"] = df["tot_15_24_edu_06"] + df["tot_25_64_edu_06"] + df["tot_65_over_edu_06"]
+df["uni_hh_06"] = df["uni_hh_15_24_06"] + df["uni_hh_25_64_06"] + df["uni_hh_65_over_06"]
+df["per_col_06"] = df["uni_hh_06"] / df["tot_15_edu_06"] 
+all_cma["tot_15_edu_06"] = all_cma["tot_15_24_edu_06"] + all_cma["tot_25_64_edu_06"] + all_cma["tot_65_over_edu_06"]
+all_cma["uni_hh_06"] = all_cma["uni_hh_15_24_06"] + all_cma["uni_hh_25_64_06"] + all_cma["uni_hh_65_over_06"]
+all_cma["per_col_06"] = all_cma["uni_hh_06"] / all_cma["tot_15_edu_06"]
+
+## 2016
+df["per_col_16"] = df["uni_hh_16"] / df["tot_15_edu_16"]
+all_cma["per_col_16"] = all_cma["uni_hh_16"] / all_cma["tot_15_edu_16"]
+
+# Housing units built
+# --------------------------------------------------------------------------
+df["per_units_pre60_16"] = df["dwellings_built_pre_1960_16"] / df["old_building_denom_16"]
+
+all_cma["per_units_pre60_16"] = all_cma["dwellings_built_pre_1960_16"] / all_cma["old_building_denom_16"]
+
+
 
 # ==========================================================================
 # Rent, Median income, Home Value Data 
@@ -559,216 +692,73 @@ len(all_census)
 
 # 1996
 all_cma["real_avghval_96"] = all_cma["avghval_96"] * CPI_95_16
-all_cma["real_avgrent_96"] = all_cma["avgrent_96"] * CPI_95_16
+all_cma["real_avgrent_96"] = all_cma["per_rent_96"] * (all_cma["avg_r_shelter_96"] * CPI_95_16) + all_cma["per_own_96"] * (all_cma["avg_o_shelter_96"] * CPI_95_16)
 all_cma["real_mhhinc_96"] = all_cma["mhhinc_96"] * CPI_95_16
+all_cma["real_avghhinc_96"] = all_cma["avghhinc_96"] * CPI_95_16
 
 all_census["real_avghval_96"] = all_census["avghval_96"] * CPI_95_16
-all_census["real_avgrent_96"] = all_census["avgrent_96"] * CPI_95_16
+all_census["real_avgrent_96"] = all_census["per_rent_96"] * (all_census["avg_r_shelter_96"] * CPI_95_16) + all_census["per_own_96"] * (all_census["avg_o_shelter_96"] * CPI_95_16)
 all_census["real_mhhinc_96"] = all_census["mhhinc_96"] * CPI_95_16
+all_census["real_avghhinc_96"] = all_census["avghhinc_96"] * CPI_95_16
 
 # 2006
 all_cma["real_avghval_06"] = all_cma["avghval_06"] * CPI_05_16
-all_cma["real_avgrent_06"] = all_cma["avgrent_06"] * CPI_05_16
+all_cma["real_avgrent_06"] = all_cma["per_rent_06"] * (all_cma["avg_r_shelter_06"] * CPI_05_16) + all_cma["per_own_06"] * (all_cma["avg_o_shelter_06"] * CPI_05_16)
 all_cma["real_mhhinc_06"] = all_cma["mhhinc_06"] * CPI_05_16
+all_cma["real_avghhinc_06"] = all_cma["avghhinc_06"] * CPI_05_16
 
 all_census["real_avghval_06"] = all_census["avghval_06"] * CPI_05_16
-all_census["real_avgrent_06"] = all_census["avgrent_06"] * CPI_05_16
+all_census["real_avgrent_06"] = all_census["per_rent_06"] * (all_census["avg_r_shelter_06"] * CPI_05_16) + all_census["per_own_06"] * (all_census["avg_o_shelter_06"] * CPI_05_16)
 all_census["real_mhhinc_06"] = all_census["mhhinc_06"] * CPI_05_16
+all_census["real_avghhinc_06"] = all_census["avghhinc_06"] * CPI_05_16
 
 # 2011
-all_cma["real_mhval_11"] = all_cma["mval_11"] * CPI_10_16
-all_cma["real_mrent_11"] = all_cma["mhcosts_r_11"] * CPI_10_16
+all_cma["real_mhval_11"] = all_cma["mhval_11"] * CPI_10_16
+all_cma["real_mrent_11"] = all_cma["per_rent_11"] * (all_cma["mhcosts_r_11"] * CPI_10_16) + all_cma["per_own_11"] * (all_cma["mhcosts_o_11"] * CPI_10_16)
+all_census["real_mhval_11"] = all_census["mhval_11"] * CPI_10_16
+all_census["real_mrent_11"] = all_census["per_rent_11"] * (all_census["mhcosts_r_11"] * CPI_10_16) + all_census["per_own_11"] * (all_census["mhcosts_o_11"] * CPI_10_16)
 
-all_census["real_mhval_11"] = all_census["mval_11"] * CPI_10_16
-all_census["real_mrent_11"] = all_census["mhcosts_r_11"] * CPI_10_16
+all_cma["real_avghval_11"] = all_cma["avghval_11"] * CPI_10_16
+all_cma["real_avgrent_11"] = all_cma["per_rent_11"] * (all_cma["avg_r_shelter_11"] * CPI_10_16) + all_cma["per_own_11"] * (all_cma["avg_o_shelter_11"] * CPI_10_16)
+all_census["real_avghval_11"] = all_census["avghval_11"] * CPI_10_16
+all_census["real_avgrent_11"] =all_census["per_rent_11"] * (all_census["avg_r_shelter_11"] * CPI_10_16) + all_census["per_own_11"] * (all_census["avg_o_shelter_11"] * CPI_10_16)
 
 # 2016
-all_cma["real_avghval_16"] = all_cma["avghval_16"]
-all_cma["real_avgrent_16"] = all_cma["avgrent_16"]
 all_cma["real_mhhinc_16"] = all_cma["mhhinc_16"]
-all_cma["real_mhval_16"] = all_cma["mhval_16"]
-all_cma["real_mrent_16"] = all_cma["mhcosts_r_16"]
-
-all_census["real_avghval_16"] = all_census["avghval_16"]
-all_census["real_avgrent_16"] = all_census["avgrent_16"]
 all_census["real_mhhinc_16"] = all_census["mhhinc_16"]
 all_census["real_mhval_16"] = all_census["mhval_16"]
-all_census["real_mrent_16"] = all_census["mhcosts_r_16"]
-# ==========================================================================
-# Demographic Data 
-# ==========================================================================
+all_cma["real_mhval_16"] = all_cma["mhval_16"]
 
-df = all_census
+all_census["real_avgrent_16"] = all_census["per_rent_16"] * (all_census["avg_r_shelter_16"]) + all_census["per_own_16"] * (all_census["avg_o_shelter_16"])
 
-# --------------------------------------------------------------------------
-## 1996 - does not have a vector in google sheets doc, though there is potentially an option in the census
-df["per_visible_minority_96"] = df["visible_minority_96"]/df["pop_96"]
+all_cma["real_avgrent_16"] = all_cma["per_rent_16"] * (all_cma["avg_r_shelter_16"]) + all_cma["per_own_16"] * (all_cma["avg_o_shelter_16"])
 
-## 2006
-df["per_visible_minority_06"] = df["visible_minority_06"]/df["pop_06"]
+all_census["real_mrent_16"] = all_census["per_rent_16"] * (all_census["mhcosts_r_16"]) + all_census["per_own_16"] * (all_census["mhcosts_o_16"])
 
-## 2016
-df["per_visible_minority_16"] = df["visible_minority_16"]/df["pop_16"]
+all_cma["real_mrent_16"] = all_cma["per_rent_16"] * (all_cma["mhcosts_r_16"]) + all_cma["per_own_16"] * (all_cma["mhcosts_o_16"])
 
-
-all_cma["per_visible_minority_96"] = all_cma["visible_minority_96"]/all_cma["pop_96"]
-
-## 2006
-all_cma["per_visible_minority_06"] = all_cma["visible_minority_06"]/all_cma["pop_06"]
-
-## 2016
-all_cma["per_visible_minority_16"] = all_cma["visible_minority_16"]/all_cma["pop_16"]
-
-
-# % of owner and renter-occupied housing units
-# --------------------------------------------------------------------------
-
-# housing units, percentage of renters 
-## 1996
-df["hu_96"] = df["ohu_96"] + df["rhu_96"]
-df["per_rent_96"] = df["rhu_96"] / df["hu_96"]
-
-## 2006
-df["hu_06"] = df["ohu_06"] + df["rhu_06"]
-df["per_rent_06"] = df["rhu_06"] / df["hu_06"]
-
-## 2016
-df["hu_16"] = df["ohu_16"] + df["rhu_16"]
-df["per_rent_16"] = df["rhu_16"] / df["hu_16"]
-
-## 1996
-all_cma["hu_96"] = all_cma["ohu_96"] + all_cma["rhu_96"]
-all_cma["per_rent_96"] = all_cma["rhu_96"] / all_cma["hu_96"]
-
-## 2006
-all_cma["hu_06"] = all_cma["ohu_06"] + all_cma["rhu_06"]
-all_cma["per_rent_06"] = all_cma["rhu_06"] / all_cma["hu_06"]
-
-## 2016
-all_cma["hu_16"] = all_cma["ohu_16"] + all_cma["rhu_16"]
-all_cma["per_rent_16"] = all_cma["rhu_16"] / all_cma["hu_16"]
-
-
-# % of uni educated HHs / over 25 reporting education == percent_college_educated
-# --------------------------------------------------------------------------
-
-# 1996
-df["per_col_96"] = df["uni_hh_96"] / df["tot_15_edu_96"]
-
-df["tot_15_edu_06"] = df["tot_15_24_edu_06"] + df["tot_25_64_edu_06"] + df["tot_65_over_edu_06"]
-
-df["uni_hh_06"] = df["uni_hh_15_24_06"] + df["uni_hh_25_64_06"] + df["uni_hh_65_over_06"]
-## 2006
-df["per_col_06"] = df["uni_hh_06"] / df["tot_15_edu_06"] 
-
-## 2016
-df["per_col_16"] = df["uni_hh_16"] / df["tot_15_edu_16"]
-
-# 1996
-all_cma["per_col_96"] = all_cma["uni_hh_96"] / all_cma["tot_15_edu_96"]
-
-## 2006
-all_cma["tot_15_edu_06"] = all_cma["tot_15_24_edu_06"] + all_cma["tot_25_64_edu_06"] + all_cma["tot_65_over_edu_06"]
-all_cma["uni_hh_06"] = all_cma["uni_hh_15_24_06"] + all_cma["uni_hh_25_64_06"] + all_cma["uni_hh_65_over_06"]
-all_cma["per_col_06"] = all_cma["uni_hh_06"] / all_cma["tot_15_edu_06"]
-
-## 2016
-all_cma["per_col_16"] = all_cma["uni_hh_16"] / all_cma["tot_15_edu_16"]
-
-
-# Housing units built
-# --------------------------------------------------------------------------
-
-# only in the 2016 data as well
-# percent of old buildings = 1960 or before / total dwelling units
-
-df["per_units_pre60_16"] = df["dwellings_built_pre_1960_16"] / df["old_building_denom_16"]
-
-all_cma["per_units_pre60_16"] = all_cma["dwellings_built_pre_1960_16"] / all_cma["old_building_denom_16"]
-
-## Percent of people who have moved who are low-income
-# This function interpolates in mover population counts using income buckets provided by the Census
-
-def income_interpolation_movein (census, year, cutoff, rm_iinc):
-    # SUM EVERY CATEGORY BY INCOME
-    ## Filter only move-in variables
-    name = []
-    for c in list(census.columns):
-        if (c[0:3] == "mov") & (c[-2:]==year):
-            name.append(c)
-    name.append("GeoUID")
-    income_cat = census[name]
-    ## Pull income categories
-    income_group = income_cat.drop(columns = ["GeoUID"]).columns
-    number = []
-    for c in name[:9]:
-        number.append(c.split("_")[2])
-    ## Sum move-in in last 5 years by income category, including total w/ income
-    column_name_totals = []
-    for i in number:
-        column_name = []
-        for j in income_group:
-            if j.split("_")[2] == i:
-                column_name.append(j)
-        if i == "w":
-            i = "w_income"
-        income_cat["mov_tot_"+i+"_"+year] = income_cat[column_name].sum(axis = 1)
-        column_name_totals.append("mov_tot_"+i+"_"+year)
-    # DO INCOME INTERPOLATION
-    column = []
-    number = [n for n in number if n != "w"] ## drop total
-    for i in number:
-        column.append("prop_mov_"+i)
-        income_cat["prop_mov_"+i] = income_cat["mov_tot_"+i+"_"+year]/income_cat["mov_tot_w_income_"+year]
-    reg_avg_cutoff = cutoff*rm_iinc
-    cumulative = "inc"+str(int(cutoff*100))+"_cumulative"
-    per_limove = "per_limove_"+year
-    df = income_cat
-    df[cumulative] = 0
-    df[per_limove] = 0
-    for i in range(0,(len(number)-1)):
-
-        a = (number[i])
-        b = float(number[i+1])-0.01
-        prop = str(number[i+1])
-        df[cumulative] = df[cumulative]+df["prop_mov_"+a]
-        if (reg_avg_cutoff>=int(a))&(reg_avg_cutoff<b):
-            df[per_limove] = ((reg_avg_cutoff - int(a))/(b-int(a)))*df["prop_mov_"+prop] + df[cumulative]           
-    df = df.drop(columns = [cumulative])
-    prop_col = df.columns[df.columns.str[0:4]=="prop"] 
-    df = df.drop(columns = prop_col)     
-    col_list = [per_limove]+["mov_tot_w_income_"+year]
-    census = census.merge (df[["GeoUID"] + col_list], on = "GeoUID")
-    return census
-
-
-# move in income interp uses regional individual income
-# cannot do this for canadian data
-
-# all_census = income_interpolation_movein(all_census, "16", 0.8, rm_iinc_16)
-# all_census = income_interpolation_movein(all_census, "06", 0.8, rm_iinc_06)
-
-len(all_census)
+# very high income : tracts with a median income in 2016 > 1.8 * RMI
+all_census["VHI"] = all_census["real_mhhinc_16"] > (1.8 * rm_hhinc_16)
 
 # ==========================================================================
 # Housing Affordability Variables
 # ==========================================================================  
-# this was formerly pums. for canadian data, used renters / owners # of households and median monthly shelter costs for renters / owners
-# to do what pums was doing 
 
- # divide by twelve to turn annumal median income - > monthly for comparison with median monthly shelter costs
-aff_16 = rm_hhinc_16*0.3/12
+aff_16 = rm_hhinc_16 * 0.3 / 12
+
+all_cma["real_avghval_16"] = all_cma["avghval_16"]
+
+all_cma["real_avghhinc_16"] = all_cma["avghhinc_16"]
+
+all_census["real_avghval_16"] = all_census["avghval_16"]
+
+all_census["real_avghhinc_16"] = all_census["avghhinc_16"]
 
 all_census["rent_burdened_hh_16"] = (all_census["t_30_pct_16"] / 100) * all_census["rhu_16"]
 all_census["owner_burdened_hh_16"] = (all_census["o_30_pct_16"] / 100) * all_census["ohu_16"]
 all_census["pct_all_burdened_hh_16"] = (all_census["rent_burdened_hh_16"] + all_census["owner_burdened_hh_16"]) / all_census["hu_16"]
 
-all_census["pct_low_16"] = all_census["low_80120_16"] * all_census["pct_all_burdened_hh_16"]
-all_census["pct_mod_16"] = all_census["mod_80120_16"] * all_census["pct_all_burdened_hh_16"]
-all_census["pct_high_16"] = all_census["high_80120_16"] * all_census["pct_all_burdened_hh_16"]
-
-
-# Classifying tracts by housing afforablde by income  
+# Classifying housing afforability by income  
 # --------------------------------------------------------------------------
 
 ## Low income
@@ -790,20 +780,23 @@ all_census["predominantly_MI"] = np.where((all_census["low_80120_16"]<0.45)&
 all_census["mixed_low"] = np.where((all_census["predominantly_LI"]==0)&
                                (all_census["predominantly_MI"]==0)&
                                (all_census["predominantly_HI"]==0)&
-                               ((all_census["mhcosts_r_16"]<aff_16*0.6) | (all_census["mhcosts_o_16"]<aff_16*0.6)),1,0)
+                               (all_census["real_mrent_16"]<aff_16*0.6)
+                                ,1,0)
 
 ## Mixed-Moderate income
 all_census["mixed_mod"] = np.where((all_census["predominantly_LI"]==0)&
                                (all_census["predominantly_MI"]==0)&
                                (all_census["predominantly_HI"]==0)&
-                               ((all_census["mhcosts_r_16"]>=aff_16*0.6) | (all_census["mhcosts_o_16"]>=aff_16*0.6))&
-                               ((all_census["mhcosts_r_16"]<aff_16*1.2) | (all_census["mhcosts_o_16"]<aff_16*1.2)),1,0)
+                               ((all_census["real_mrent_16"] >= (.6 * aff_16)) &
+                               (all_census["real_mrent_16"]<(aff_16*1.2))
+                                ),1,0)
 
 ## Mixed-High income
 all_census["mixed_high"] = np.where((all_census["predominantly_LI"]==0)&
                                (all_census["predominantly_MI"]==0)&
                                (all_census["predominantly_HI"]==0)&
-                               ((all_census["mhcosts_r_16"]>=aff_16*1.2) | (all_census["mhcosts_o_16"]>=aff_16*1.2)),1,0)
+                               ((all_census["real_mrent_16"]>=(aff_16*1.2))
+                                ),1,0)
 
 all_census["lmh_flag_encoded"] = 0
 all_census.loc[all_census["predominantly_LI"]==1, "lmh_flag_encoded"] = 1
@@ -827,54 +820,70 @@ len(all_census)
 # Setting "Market Types"
 # ==========================================================================
 
-# averages to compare across time. there is no census tract level housing data for median costs / home value
-
+all_census = all_census.replace(np.inf, np.nan)
+all_cma = all_cma.replace(np.inf, np.nan)
 # 1996 - 2016 (averages)
 all_cma["pctch_real_avghval_96_16"] = (all_cma["real_avghval_16"]-all_cma["real_avghval_96"])/all_cma["real_avghval_96"]
 all_cma["pctch_real_avgrent_96_16"] = (all_cma["real_avgrent_16"]-all_cma["real_avgrent_96"])/all_cma["real_avgrent_96"]
 all_census["pctch_real_avghval_96_16"] = (all_census["real_avghval_16"]-all_census["real_avghval_96"])/all_census["real_avghval_96"]
 all_census["pctch_real_avgrent_96_16"] = (all_census["real_avgrent_16"]-all_census["real_avgrent_96"])/all_census["real_avgrent_96"]
-ravg_pctch_real_avghval_96_16_increase = np.nanmean(all_cma["pctch_real_avghval_96_16"][all_cma["pctch_real_avghval_96_16"] > 0.05])
-ravg_pctch_real_avgrent_96_16_increase = np.nanmean(all_cma["pctch_real_avgrent_96_16"][all_cma["pctch_real_avgrent_96_16"] > 0.05])
-
-
 
 # 2006 - 2016 (averages)
 all_cma["pctch_real_avghval_06_16"] = (all_cma["real_avghval_16"]-all_cma["real_avghval_06"])/all_cma["real_avghval_06"]
 all_cma["pctch_real_avgrent_06_16"] = (all_cma["real_avgrent_16"]-all_cma["real_avgrent_06"])/all_cma["real_avgrent_06"]
 all_census["pctch_real_avghval_06_16"] = (all_census["real_avghval_16"]-all_census["real_avghval_06"])/all_census["real_avghval_06"]
 all_census["pctch_real_avgrent_06_16"] = (all_census["real_avgrent_16"]-all_census["real_avgrent_06"])/all_census["real_avgrent_06"]
-ravg_pctch_real_avghval_06_16_increase = np.nanmean(all_census["pctch_real_avghval_06_16"][all_census["pctch_real_avghval_06_16"] > 0.05])
-ravg_pctch_real_avgrent_06_16_increase = np.nanmean(all_census["pctch_real_avgrent_06_16"][all_census["pctch_real_avgrent_06_16"] > 0.05])
 
-# 2011 - 2016 (medians)
+# 2011 - 2016 (medians and averages)
+all_cma["pctch_real_avghval_11_16"] = (all_cma["real_avghval_16"]-all_cma["real_avghval_11"])/all_cma["real_avghval_11"]
+all_cma["pctch_real_avgrent_11_16"] = (all_cma["real_avgrent_16"]-all_cma["real_avgrent_11"])/all_cma["real_avgrent_11"]
+all_census["pctch_real_avghval_11_16"] = (all_census["real_avghval_16"]-all_census["real_avghval_11"])/all_census["real_avghval_11"]
+all_census["pctch_real_avgrent_11_16"] = (all_census["real_avgrent_16"]-all_census["real_avgrent_11"])/all_census["real_avgrent_11"]
+
 all_cma["pctch_real_mhval_11_16"] = (all_cma["real_mhval_16"]-all_cma["real_mhval_11"])/all_cma["real_mhval_11"]
 all_cma["pctch_real_mrent_11_16"] = (all_cma["real_mrent_16"]-all_cma["real_mrent_11"])/all_cma["real_mrent_11"]
-all_census["pctch_real_mhval_11_16"] = (all_census["real_mhval_16"]-all_census["real_mhval_11"])/all_census["real_mhval_11"]
+all_census["pctch_real_mhval_11_16"] = (all_census["real_mhval_16"]-all_census["real_avghval_11"])/all_census["real_mhval_11"]
 all_census["pctch_real_mrent_11_16"] = (all_census["real_mrent_16"]-all_census["real_mrent_11"])/all_census["real_mrent_11"]
-rm_pctch_real_mhval_11_16_increase=np.nanmedian(all_census['pctch_real_mhval_11_16'][all_census['pctch_real_mhval_11_16']>0.05])
-rm_pctch_real_mrent_11_16_increase=np.nanmedian(all_census['pctch_real_mrent_11_16'][all_census['pctch_real_mrent_11_16']>0.05])
-# removed check for > .05, otherwise rent_increase is always negative since it can"t both be >= .05 and < 0
+
+# protect against dividing by zeros
 all_census = all_census.replace(np.inf, np.nan)
 all_cma = all_cma.replace(np.inf, np.nan)
+# only want strictly increasing tracts
 
+# CMASs: 
+ravg_pctch_real_avghval_96_16_CMA = np.nanmean(all_cma["pctch_real_avghval_96_16"])
+ravg_pctch_real_avgrent_96_16_CMA = np.nanmean(all_cma["pctch_real_avgrent_96_16"])
 
+ravg_pctch_real_avghval_06_16_CMA = np.nanmean(all_cma["pctch_real_avghval_06_16"])
+ravg_pctch_real_avgrent_06_16_CMA = np.nanmean(all_cma["pctch_real_avgrent_06_16"])
+
+ravg_pctch_real_avghval_11_16_CMA = np.nanmean(all_cma['pctch_real_avghval_11_16'])
+ravg_pctch_real_avgrent_11_16_CMA = np.nanmean(all_cma['pctch_real_avgrent_11_16'])
+
+rm_pctch_real_mhval_11_16_CMA = np.nanmedian(all_cma['pctch_real_mhval_11_16'])
+rm_pctch_real_mrent_11_16_CMA = np.nanmedian(all_cma['pctch_real_mrent_11_16'])
+
+# change in rent: use 2006 - 2016 change
 all_census["rent_decrease"] = np.where((all_census["pctch_real_avgrent_06_16"]<=-0.05), 1, 0)
+
 all_census["rent_marginal"] = np.where((all_census["pctch_real_avgrent_06_16"]>-0.05)&
                                           (all_census["pctch_real_avgrent_06_16"]<0.05), 1, 0)
+
 all_census["rent_increase"] = np.where((all_census["pctch_real_avgrent_06_16"]>=0.05)&
-                                          (all_census["pctch_real_avgrent_06_16"]<ravg_pctch_real_avgrent_06_16_increase), 1, 0)
+                                          (all_census["pctch_real_avgrent_06_16"]<ravg_pctch_real_avgrent_06_16_CMA), 1, 0)
 all_census["rent_rapid_increase"] = np.where((all_census["pctch_real_avgrent_06_16"]>=0.05)&
-                                          (all_census["pctch_real_avgrent_06_16"]>=ravg_pctch_real_avgrent_06_16_increase), 1, 0)
+                                          (all_census["pctch_real_avgrent_06_16"]>=ravg_pctch_real_avgrent_06_16_CMA), 1, 0)
 
-all_census["house_decrease"] = np.where((all_census["pctch_real_avghval_96_16"]<=-0.05), 1, 0)
-all_census["house_marginal"] = np.where((all_census["pctch_real_avghval_96_16"]>-0.05)&
-                                          (all_census["pctch_real_avghval_96_16"]<0.05), 1, 0)
-all_census["house_increase"] = np.where((all_census["pctch_real_avghval_96_16"]>=0.05)&
-                                          (all_census["pctch_real_avghval_96_16"]<ravg_pctch_real_avghval_96_16_increase), 1, 0)
-all_census["house_rapid_increase"] = np.where((all_census["pctch_real_avghval_96_16"]>=0.05)&
-                                          (all_census["pctch_real_avghval_96_16"]>=ravg_pctch_real_avghval_96_16_increase), 1, 0)
+# change in housing value : use 2006 - 2016 change
 
+all_census["house_decrease"] = np.where((all_census["pctch_real_avghval_06_16"]<=-0.05), 1, 0)
+all_census["house_marginal"] = np.where((all_census["pctch_real_avghval_06_16"]>-0.05)&
+                                          (all_census["pctch_real_avghval_06_16"]<0.05), 1, 0)
+all_census["house_increase"] = np.where((all_census["pctch_real_avghval_06_16"]>=0.05)&
+                                          (all_census["pctch_real_avghval_06_16"]<ravg_pctch_real_avghval_06_16_CMA), 1, 0)
+all_census["house_rapid_increase"] = np.where((all_census["pctch_real_avghval_06_16"]>=0.05)&
+                                          (all_census["pctch_real_avghval_06_16"]>=ravg_pctch_real_avghval_06_16_CMA), 1, 0)
+ 
 all_census["tot_decrease"] = np.where((all_census["rent_decrease"]==1)|(all_census["house_decrease"]==1), 1, 0)
 all_census["tot_marginal"] = np.where((all_census["rent_marginal"]==1)|(all_census["house_marginal"]==1), 1, 0)
 all_census["tot_increase"] = np.where((all_census["rent_increase"]==1)|(all_census["house_increase"]==1), 1, 0)
@@ -890,225 +899,224 @@ all_census.loc[all_census["change_flag_encoded"]==1, "change_flag_category"] = "
 all_census.loc[all_census["change_flag_encoded"]==2, "change_flag_category"] = "ch_increase"
 all_census.loc[all_census["change_flag_encoded"]==3, "change_flag_category"] = "ch_rapid_increase"
 
-all_census.groupby("change_flag_category").count()["GeoUID"]
-len(all_census)
+# use 2011 - 2016 medians here
+percentile_90 = all_census["pctch_real_mhval_11_16"].quantile(q = 0.9)
+# find changes > 50th percentile
+all_census["ab_50pct_ch"] = np.where(all_census["pctch_real_mhval_11_16"]>0.5, 1, 0)
+all_census["ab_90percentile_ch"] = np.where(all_census["pctch_real_mhval_11_16"]>percentile_90, 1, 0)
 
-
-# ==========================================================================
-# Zillow Data
-# ==========================================================================
-
-# Load Zillow Data 
-# --------------------------------------------------------------------------
-
-def filter_ZILLOW(df, FIPS):
-    if (city_name not in ("Memphis", "Boston")):
-        FIPS_pre = [state+county for county in FIPS]
-        df = df[(df["FIPS"].astype(str).str.zfill(11).str[:5].isin(FIPS_pre))].reset_index(drop = True)
-    else:
-        fips_list = []
-        for i in state:
-            county = FIPS[str(i)]
-            FIPS_pre = [str(i)+county for county in county]         
-        df = df[(df["FIPS"].astype(str).str.zfill(11).str[:5].isin(FIPS_pre))].reset_index(drop = True)
-    return df
-
-## Import Zillow data
-# zillow = pd.read_csv(input_path+"Zip_Zhvi_AllHomes.csv", encoding = "ISO-8859-1")
-# zillow_xwalk = pd.read_csv(input_path+"TRACT_ZIP_032015.csv")
-
-# Calculate Zillow Measures
-# --------------------------------------------------------------------------
-
-## Compute change over time
-# zillow["ch_zillow_12_18"] = zillow["2018-01"] - zillow["2012-01"]*CPI_12_18
-
-
-
-# zillow["per_ch_zillow_12_18"] = zillow["ch_zillow_12_18"]/zillow["2012-01"]
-# zillow = zillow[zillow["State"].isin(state_init)].reset_index(drop = True)
-# zillow = zillow_xwalk[["TRACT", "ZIP", "RES_RATIO"]].merge(zillow[["RegionName", "ch_zillow_12_18", "per_ch_zillow_12_18"]], left_on = "ZIP", right_on = "RegionName", how = "outer")
-# zillow = zillow.rename(columns = {"TRACT":"FIPS"})
-
-# Filter only data of interest
-# zillow = filter_ZILLOW(zillow, FIPS)
-
-## Keep only data for largest xwalk value, based on residential ratio
-# zillow = zillow.sort_values(by = ["FIPS", "RES_RATIO"], ascending = False).groupby("FIPS").first().reset_index(drop = False)
-
-## Compute 90th percentile change in region
-percentile_90 = all_census["pctch_real_avghval_06_16"].quantile(q = 0.9)
-# print(percentile_90)
-
-# Create Flags
-# --------------------------------------------------------------------------
-
-## Change over 50% of change in region
-# zillow["ab_50pct_ch"] = np.where(zillow["per_ch_zillow_12_18"]>0.5, 1, 0)
-
-## Change over 90th percentile change
-# zillow["ab_90percentile_ch"] = np.where(zillow["per_ch_zillow_12_18"]>percentile_90, 1, 0)
-
-# merge with all_census here!!
-# variables from zillow: percent change between 2012 and 2018, what fraction had a 50+ % change, what had 90+ % change
-
-
-# zillow compares housing value, so do the same to assign ab_50pct_ch / ab_90percentile_ch to all_census
-
-all_census["ab_50pct_ch"] = np.where(all_census["pctch_real_avghval_06_16"]>0.5, 1, 0)
-all_census["ab_90percentile_ch"] = np.where(all_census["pctch_real_avghval_06_16"]>percentile_90, 1, 0)
-
-# census_zillow = all_census.merge(zillow[["FIPS", "per_ch_zillow_12_18", "ab_50pct_ch", "ab_90percentile_ch"]], on = "FIPS")
-
-## Create 90th percentile for rent - 
-all_census["rent_percentile_90"] = all_census["pctch_real_avgrent_06_16"].quantile(q = 0.9)
-all_census["rent_50pct_ch"] = np.where(all_census["pctch_real_avgrent_06_16"]>=0.5, 1, 0)
-all_census["rent_90percentile_ch"] = np.where(all_census["pctch_real_avgrent_06_16"]>=0.9, 1, 0)
+# now, do it for *rent*
+all_census["rent_50pct_ch"] = np.where(all_census["pctch_real_mrent_11_16"]>=0.5, 1, 0)
+all_census["rent_90percentile_ch"] = np.where(all_census["pctch_real_mrent_11_16"]>=0.9, 1, 0)
 
 # ==========================================================================
-# Calculate Regional Medians
+# Calculate Regional Medians - use CMA
 # ==========================================================================
 
 # Calculate medians necessary for typology designation
 # --------------------------------------------------------------------------
-# do cma instead
-
-
 rm_per_all_li_96 = np.nanmedian(all_cma["per_all_li_96"])
 rm_per_all_li_06 = np.nanmedian(all_cma["per_all_li_06"])
 rm_per_all_li_16 = np.nanmedian(all_cma["per_all_li_16"])
+
 rm_per_visible_minority_96 = np.nanmedian(all_cma["per_visible_minority_96"])
 rm_per_visible_minority_06 = np.nanmedian(all_cma["per_visible_minority_06"])
 rm_per_visible_minority_16 = np.nanmedian(all_cma["per_visible_minority_16"])
+
 rm_per_col_96 = np.nanmedian(all_cma["per_col_96"])
 rm_per_col_06 = np.nanmedian(all_cma["per_col_06"])
 rm_per_col_16 = np.nanmedian(all_cma["per_col_16"])
-ravg_per_rent_96= np.nanmean(all_cma["per_rent_96"])
-ravg_per_rent_06= np.nanmean(all_cma["per_rent_06"])
-ravg_per_rent_16= np.nanmean(all_cma["per_rent_16"])
+
+rm_per_rent_96= np.nanmedian(all_cma["per_rent_96"])
+rm_per_rent_06= np.nanmedian(all_cma["per_rent_06"])
+rm_per_rent_16= np.nanmedian(all_cma["per_rent_16"])
+
 ravg_real_avgrent_96 = np.nanmean(all_cma["real_avgrent_96"])
 ravg_real_avgrent_06 = np.nanmean(all_cma["real_avgrent_06"])
 ravg_real_avgrent_16 = np.nanmean(all_cma["real_avgrent_16"])
+
 ravg_real_avghval_96 = np.nanmean(all_cma["real_avghval_96"])
 ravg_real_avghval_06 = np.nanmean(all_cma["real_avghval_06"])
 ravg_real_avghval_16 = np.nanmean(all_cma["real_avghval_16"])
+
 rm_real_mhhinc_96 = np.nanmedian(all_cma["real_mhhinc_96"])
 rm_real_mhhinc_06 = np.nanmedian(all_cma["real_mhhinc_06"])
 rm_real_mhhinc_16 = np.nanmedian(all_cma["real_mhhinc_16"])
 
-rm_real_mrent_16 = np.nanmedian(all_cma["mhcosts_r_16"])
-rm_real_mhval_16 = np.nanmedian(all_cma["mhval_16"])
+ravg_real_avghhinc_96 = np.nanmean(all_cma["real_avghhinc_96"])
+ravg_real_avghhinc_06 = np.nanmean(all_cma["real_avghhinc_06"])
+ravg_real_avghhinc_16 = np.nanmean(all_cma["real_avghhinc_16"])
 
-all_census["super_high_mhinc"] = np.where((all_census["real_mhhinc_16"] > 2 * rm_real_mhhinc_16), 1, 0)
 rm_per_units_pre50_16 = np.nanmedian(all_cma["per_units_pre60_16"])
 
-# only 2 use zillow variables
 ravg_per_ch_avghval_06_16 = np.nanmean(all_cma["pctch_real_avghval_06_16"])
 ravg_pctch_real_avgrent_06_16 = np.nanmean(all_cma["pctch_real_avgrent_06_16"])
 
-## Above regional median change home value and rent
-# these use zillow
+rm_real_mrent_11 = np.nanmedian(all_cma["real_mrent_11"])
+rm_real_mhval_11 = np.nanmedian(all_cma["real_mhval_11"])
+rm_real_mrent_16 = np.nanmedian(all_cma["real_mrent_16"])
+rm_real_mhval_16 = np.nanmedian(all_cma["real_mhval_16"])
+
+ravg_real_avgrent_11 = np.nanmean(all_cma["real_avgrent_11"])
+ravg_real_avghval_11 = np.nanmean(all_cma["real_avghval_11"])
+ravg_real_avgrent_16 = np.nanmean(all_cma["real_avgrent_16"])
+ravg_real_avghval_16 = np.nanmean(all_cma["real_avghval_16"])
+
+ravg_per_ch_avghval_11_16 = np.nanmean(all_cma["pctch_real_avghval_11_16"])
+ravg_pctch_real_avgrent_11_16 = np.nanmean(all_cma["pctch_real_avgrent_11_16"])
+
+rm_per_ch_mhval_11_16 = np.nanmean(all_cma["pctch_real_mhval_11_16"])
+rm_pctch_real_mrent_11_16 = np.nanmean(all_cma["pctch_real_mrent_11_16"])
+
+
+## Above regional median change (2011 - 2016)
+## Above regional average change (2006 - 2016)
+all_census["hv_abrm_ch"] = np.where(all_census["pctch_real_mhval_11_16"] > rm_per_ch_mhval_11_16, 1, 0)
+all_census["rent_abrm_ch"] = np.where(all_census["pctch_real_mrent_11_16"] > rm_pctch_real_mrent_11_16, 1, 0)
 all_census["hv_abravg_ch"] = np.where(all_census["pctch_real_avghval_06_16"] > ravg_per_ch_avghval_06_16, 1, 0)
 all_census["rent_abravg_ch"] = np.where(all_census["pctch_real_avgrent_06_16"] > ravg_pctch_real_avgrent_06_16, 1, 0)
 
 ## Percent changes
-# use census only data
 all_census["pctch_real_avghval_96_06"] = (all_census["real_avghval_06"] - all_census["real_avghval_96"]) / all_census["real_avghval_96"]
 all_census["pctch_real_avgrent_96_06"] = (all_census["real_avgrent_06"] - all_census["real_avgrent_96"]) / all_census["real_avgrent_96"]
 all_census["pctch_real_mhhinc_96_06"] = (all_census["real_mhhinc_06"] - all_census["real_mhhinc_96"]) / all_census["real_mhhinc_96"]
-# uses census only data
+all_census["pctch_real_avghhinc_96_06"] = (all_census["real_avghhinc_06"] - all_census["real_avghhinc_96"]) / all_census["real_avghhinc_96"]
+
 all_census["pctch_real_avghval_06_16"] = (all_census["real_avghval_16"] - all_census["real_avghval_06"]) / all_census["real_avghval_06"]
 all_census["pctch_real_avgrent_96_16"] = (all_census["real_avgrent_16"] - all_census["real_avgrent_06"]) / all_census["real_avgrent_06"]
 all_census["pctch_real_mhhinc_06_16"] = (all_census["real_mhhinc_16"] - all_census["real_mhhinc_06"]) / all_census["real_mhhinc_06"]
+all_census["pctch_real_avghhinc_06_16"] = (all_census["real_avghhinc_16"] - all_census["real_avghhinc_06"]) / all_census["real_avghhinc_06"]
 
+all_census['pctch_real_mrent_11_16'] = (all_census['real_mrent_16']-all_census['real_mrent_11'])/all_census['real_mrent_11']
+all_census['pctch_real_avgrent_11_16'] = (all_census['real_avgrent_16']-all_census['real_avgrent_11'])/all_census['real_avgrent_11']
 
+all_census['pctch_real_mhval_11_16'] = (all_census['real_mhval_16']-all_census['real_mhval_11'])/all_census['real_mhval_11']
+all_census['pctch_real_avghval_11_16'] = (all_census['real_avghval_16']-all_census['real_avghval_11'])/all_census['real_avghval_11']
 
+# protect against dividing by zeros
+all_census = all_census.replace(np.inf, np.nan)
+all_cma = all_cma.replace(np.inf, np.nan)
+
+## Regional Data
+# 1996 - 2006
+pctch_ravg_real_avghval_96_06 = (ravg_real_avghval_06 - ravg_real_avghval_96) / ravg_real_avghval_96
+pctch_ravg_real_avgrent_96_06 = (ravg_real_avgrent_06 - ravg_real_avgrent_96) / ravg_real_avgrent_96
+pctch_ravg_real_avghhinc_96_06 = (ravg_real_avghhinc_06 - ravg_real_avghhinc_96) / ravg_real_avghhinc_96
+pctch_rm_real_mhhinc_96_06 = (rm_real_mhhinc_06 - rm_real_mhhinc_96) / rm_real_mhhinc_96
+# 1996 - 2016
+pctch_ravg_real_avghval_96_16 = (ravg_real_avghval_16 - ravg_real_avghval_96) / ravg_real_avghval_96
+pctch_ravg_real_avgrent_96_16 = (ravg_real_avgrent_16 - ravg_real_avgrent_96) / ravg_real_avgrent_96
+pctch_ravg_real_avghhinc_96_16 = (ravg_real_avghhinc_16 - ravg_real_avghhinc_96) / ravg_real_avghhinc_96
+pctch_rm_real_mhhinc_96_16 = (rm_real_mhhinc_16 - rm_real_mhhinc_96) / rm_real_mhhinc_96
+
+# 2006 - 2016
+pctch_ravg_real_avghval_06_16 = (ravg_real_avghval_16 - ravg_real_avghval_06) / ravg_real_avghval_06
+pctch_ravg_real_avgrent_06_16 = (ravg_real_avgrent_16 - ravg_real_avgrent_06) / ravg_real_avgrent_06
+pctch_ravg_real_avghhinc_06_16 = (ravg_real_avghhinc_16 - ravg_real_avghhinc_06) / ravg_real_avghhinc_06
+pctch_rm_real_mhhinc_06_16 = (rm_real_mhhinc_16 - rm_real_mhhinc_06) / rm_real_mhhinc_06
+
+# 2011 - 2016
+pctch_rm_real_mrent_11_16 = (rm_real_mrent_16 - rm_real_mrent_11) / rm_real_mrent_11
+pctch_rm_real_mhval_11_16 = (rm_real_mhval_16 - rm_real_mhval_11) / rm_real_mhval_11
+
+pctch_ravg_real_avgrent_11_16 = (ravg_real_avgrent_16 - ravg_real_avgrent_11) / ravg_real_avgrent_11
+pctch_ravg_real_avghval_11_16 = (ravg_real_avghval_16 - ravg_real_avghval_11) / ravg_real_avghval_11
+
+## Absolute changes in low income households / Percent changes in college educated households
+
+# 1996 - 2006
+all_census["ch_all_li_count_96_06"] = all_census["all_li_count_06"] - all_census["all_li_count_96"]
+all_census["ch_per_col_96_06"] = all_census["per_col_06"] - all_census["per_col_96"]
+
+# 1996 - 2016
+all_census["ch_all_li_count_96_16"] = all_census["all_li_count_16"] - all_census["all_li_count_96"]
+all_census["ch_per_col_96_16"] = all_census["per_col_16"] - all_census["per_col_96"]
+
+# 2006 - 2016
+all_census["ch_all_li_count_06_16"] = all_census["all_li_count_16"] - all_census["all_li_count_06"]
+all_census["ch_per_col_06_16"] = all_census["per_col_16"] - all_census["per_col_06"]
 
 ## Regional Medians
-# variables derived from census only data
-pctch_ravg_real_avghval_96_06 = (ravg_real_avghval_06-ravg_real_avghval_96)/ravg_real_avghval_96
-pctch_ravg_real_avgrent_96_06 = (ravg_real_avgrent_06-ravg_real_avgrent_96)/ravg_real_avgrent_96
-pctch_ravg_real_avgrent_96_16 = (ravg_real_avgrent_16-ravg_real_avgrent_96)/ravg_real_avgrent_96
-
-pctch_ravg_real_avghval_06_16 = (ravg_real_avghval_16-ravg_real_avghval_06)/ravg_real_avghval_06
-pctch_ravg_real_avgrent_06_16 = (ravg_real_avgrent_16-ravg_real_avgrent_06)/ravg_real_avgrent_06
-pctch_rm_real_mhhinc_96_06 = (rm_real_mhhinc_06-rm_real_mhhinc_96)/rm_real_mhhinc_96
-pctch_rm_real_mhhinc_06_16 = (rm_real_mhhinc_16-rm_real_mhhinc_06)/rm_real_mhhinc_06
-
-## Absolute changes
-# census only
-all_census["ch_all_li_count_96_06"] = all_census["all_li_count_06"]-all_census["all_li_count_96"]
-all_census["ch_all_li_count_06_16"] = all_census["all_li_count_16"]-all_census["all_li_count_06"]
-all_census["ch_all_li_count_96_16"] = all_census["all_li_count_16"]-all_census["all_li_count_96"]
-all_census["ch_per_col_96_06"] = all_census["per_col_06"]-all_census["per_col_96"]
-all_census["ch_per_col_06_16"] = all_census["per_col_16"]-all_census["per_col_06"]
-
-
-# need low income mover data for this
-# all_census["ch_per_limove_06_16"] = all_census["per_limove_16"] - all_census["per_limove_06"]
-
-## Regional Medians
-# census only
-ch_rm_per_col_96_06 = rm_per_col_06-rm_per_col_96
-ch_rm_per_col_06_16 = rm_per_col_16-rm_per_col_06
+ch_rm_per_col_96_06 = rm_per_col_06 - rm_per_col_96
+ch_rm_per_col_06_16 = rm_per_col_16 - rm_per_col_06
 
 # Calculate flags
 # --------------------------------------------------------------------------
-# census only
 df = all_census
-df["pop06flag"] = np.where(df["pop_06"]>400, 1, 0)
+df["pop06flag"] = np.where(df["pop_06"] > 400, 1, 0)
+
 df["aboverm_per_all_li_96"] = np.where(df["per_all_li_96"]>=rm_per_all_li_96, 1, 0)
 df["aboverm_per_all_li_06"] = np.where(df["per_all_li_06"]>=rm_per_all_li_06, 1, 0)
 df["aboverm_per_all_li_16"] = np.where(df["per_all_li_16"]>=rm_per_all_li_16, 1, 0)
-df["aboverm_per_visible_minority_16"] = np.where(df["per_visible_minority_16"]>=rm_per_visible_minority_16, 1, 0)
+
 df["aboverm_per_visible_minority_96"] = np.where(df["per_visible_minority_96"]>=rm_per_visible_minority_96, 1, 0)
 df["aboverm_per_visible_minority_06"] = np.where(df["per_visible_minority_06"]>=rm_per_visible_minority_06, 1, 0)
-df["aboveravg_per_rent_96"] = np.where(df["per_rent_96"]>=ravg_per_rent_96, 1, 0)
-df["aboveravg_per_rent_06"] = np.where(df["per_rent_06"]>=ravg_per_rent_06, 1, 0)
-df["aboveravg_per_rent_16"] = np.where(df["per_rent_16"]>=ravg_per_rent_16, 1, 0)
+df["aboverm_per_visible_minority_16"] = np.where(df["per_visible_minority_16"]>=rm_per_visible_minority_16, 1, 0)
+
+df["aboverm_per_rent_96"] = np.where(df["per_rent_96"]>=rm_per_rent_96, 1, 0)
+df["aboverm_per_rent_06"] = np.where(df["per_rent_06"]>=rm_per_rent_06, 1, 0)
+df["aboverm_per_rent_16"] = np.where(df["per_rent_16"]>=rm_per_rent_16, 1, 0)
+
 df["aboverm_per_col_96"] = np.where(df["per_col_96"]>=rm_per_col_96, 1, 0)
 df["aboverm_per_col_06"] = np.where(df["per_col_06"]>=rm_per_col_06, 1, 0)
 df["aboverm_per_col_16"] = np.where(df["per_col_16"]>=rm_per_col_16, 1, 0)
+
 df["aboveravg_real_avgrent_96"] = np.where(df["real_avgrent_96"]>=ravg_real_avgrent_96, 1, 0)
 df["aboveravg_real_avgrent_06"] = np.where(df["real_avgrent_06"]>=ravg_real_avgrent_06, 1, 0)
 df["aboveravg_real_avgrent_16"] = np.where(df["real_avgrent_16"]>=ravg_real_avgrent_16, 1, 0)
+
 df["aboveravg_real_avghval_96"] = np.where(df["real_avghval_96"]>=ravg_real_avghval_96, 1, 0)
 df["aboveravg_real_avghval_06"] = np.where(df["real_avghval_06"]>=ravg_real_avghval_06, 1, 0)
 df["aboveravg_real_avghval_16"] = np.where(df["real_avghval_16"]>=ravg_real_avghval_16, 1, 0)
 
-df["aboverm_real_mrent_16"] = np.where(df["mhcosts_r_16"]>=rm_real_mrent_16, 1, 0)
-df["aboverm_real_mhval_16"] = np.where(df["mhval_16"]>=rm_real_mhval_16, 1, 0)
+df["aboverm_real_mrent_11"] = np.where(df["real_mrent_11"]>=rm_real_mrent_11, 1, 0)
+df["aboverm_real_mrent_16"] = np.where(df["real_mrent_16"]>=rm_real_mrent_16, 1, 0)
+
+df["aboverm_real_mhval_11"] = np.where(df["real_mhval_11"]>=rm_real_mhval_11, 1, 0)
+df["aboverm_real_mhval_16"] = np.where(df["real_mhval_16"]>=rm_real_mhval_16, 1, 0)
+
+df["aboveravg_real_avgrent_11"] = np.where(df["real_avgrent_11"]>=ravg_real_avgrent_11, 1, 0)
+df["aboveravg_real_avgrent_16"] = np.where(df["real_avgrent_16"]>=ravg_real_avgrent_16, 1, 0)
+
+df["aboveravg_real_avghval_11"] = np.where(df["real_avghval_11"]>=ravg_real_avghval_11, 1, 0)
+df["aboveravg_real_avghval_16"] = np.where(df["real_avghval_16"]>=ravg_real_avghval_16, 1, 0)
 
 
+
+df["aboveravg_pctch_real_avghval_96_06"] = np.where(df["pctch_real_avghval_96_06"]>=pctch_ravg_real_avghval_96_06, 1, 0)
+df["aboveravg_pctch_real_avghval_96_16"] = np.where(df["pctch_real_avghval_96_16"]>=pctch_ravg_real_avghval_96_16, 1, 0)
 df["aboveravg_pctch_real_avghval_06_16"] = np.where(df["pctch_real_avghval_06_16"]>=pctch_ravg_real_avghval_06_16, 1, 0)
+
+df["aboveravg_pctch_real_avgrent_96_06"] = np.where(df["pctch_real_avgrent_96_06"]>=pctch_ravg_real_avgrent_96_06, 1, 0)
 df["aboveravg_pctch_real_avgrent_96_16"] = np.where(df["pctch_real_avgrent_96_16"]>=pctch_ravg_real_avgrent_96_16, 1, 0)
 df["aboveravg_pctch_real_avgrent_06_16"] = np.where(df["pctch_real_avgrent_06_16"]>=pctch_ravg_real_avgrent_06_16, 1, 0)
-df["aboveravg_pctch_real_avghval_96_06"] = np.where(df["pctch_real_avghval_96_06"]>=pctch_ravg_real_avghval_96_06, 1, 0)
-df["aboveravg_pctch_real_avgrent_96_06"] = np.where(df["pctch_real_avgrent_96_06"]>=pctch_ravg_real_avgrent_96_06, 1, 0)
+
+df["aboverm_pctch_real_mhval_11_16"] = np.where(df["pctch_real_mhval_11_16"]>=pctch_rm_real_mhval_11_16, 1, 0)
+df['aboverm_pctch_real_mrent_11_16'] = np.where(df['pctch_real_mrent_11_16']>=pctch_rm_real_mrent_11_16, 1, 0)
+
+df["aboveravg_pctch_real_avghval_11_16"] = np.where(df["pctch_real_avghval_11_16"]>=pctch_ravg_real_avghval_11_16, 1, 0)
+df['aboveravg_pctch_real_avgrent_11_16'] = np.where(df['pctch_real_avgrent_11_16']>=pctch_ravg_real_avgrent_11_16, 1, 0)
+
+
 df["lostli_06"] = np.where(df["ch_all_li_count_96_06"]<0, 1, 0)
 df["lostli_16"] = np.where(df["ch_all_li_count_96_16"]<0, 1, 0)
+
+df["aboveravg_pctch_real_avghhinc_96_06"] = np.where(df["pctch_real_avghhinc_96_06"]>pctch_ravg_real_avghhinc_96_06, 1, 0)
+df["aboveravg_pctch_real_avghhinc_06_16"] = np.where(df["pctch_real_avghhinc_06_16"]>pctch_ravg_real_avghhinc_06_16, 1, 0)
+
 df["aboverm_pctch_real_mhhinc_96_06"] = np.where(df["pctch_real_mhhinc_96_06"]>pctch_rm_real_mhhinc_96_06, 1, 0)
 df["aboverm_pctch_real_mhhinc_06_16"] = np.where(df["pctch_real_mhhinc_06_16"]>pctch_rm_real_mhhinc_06_16, 1, 0)
+
 df["aboverm_ch_per_col_96_06"] = np.where(df["ch_per_col_96_06"]>ch_rm_per_col_96_06, 1, 0)
 df["aboverm_ch_per_col_06_16"] = np.where(df["ch_per_col_06_16"]>ch_rm_per_col_06_16, 1, 0)
+
 df["aboverm_per_units_pre60_16"] = np.where(df["per_units_pre60_16"]>rm_per_units_pre50_16, 1, 0)
 
-
-# ==========================================================================
-# Merge Census and Zillow Data 
-# ==========================================================================
-# city_shp["CTUID"] = city_shp["CTUID"].astype(str).str[:7]
-# city_shp["CTUID"] = city_shp["CTUID"].astype("int64")
-# city_shp = city_shp.rename(columns = {"CTUID" : "GeoUID"})
-
-# all_census = all_census.merge(city_shp[["GeoUID","geometry"]])
-# census_zillow.query("FIPS == 13121011100")
 # ==========================================================================
 # Export Data 
 # ==========================================================================
-all_census.to_csv("E:\\canada_data/UDP/vancouver_database_2016.csv")
 
-all_census.to_csv("data/outputs/databases/vancouver_database_2016.csv")
+all_census.to_csv("data/outputs/databases/" +str.lower(city_name)+ "_database_2016.csv")
 
-
+all_cma.to_csv("data/outputs/databases/" +str.lower(city_name)+ "_database_2016_CMA.csv")
 # pq.write_table(output_path+"downloads/"+city_name.replace(" ", "")+"_database.parquet")

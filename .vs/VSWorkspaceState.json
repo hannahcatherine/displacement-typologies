@@ -4,7 +4,10 @@
     "\\code",
     "\\code\\canada-code",
     "\\code\\sparcc-code",
-    "\\data"
+    "\\data",
+    "\\data\\outputs",
+    "\\data\\outputs\\typologies"
   ],
+  "SelectedNode": "\\code\\sparcc-code\\sparcc-2017-5-SPARCC-Maps.r",
   "PreviewInSolutionExplorer": false
 }
