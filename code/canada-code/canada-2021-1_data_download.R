@@ -1,11 +1,16 @@
 library(cancensus)
-options(cancensus.api_key = "CensusMapper_0b92e5c233577930002b12a0e9d2d7d9")
-# options(cancensus.cache_path = "/cache_data")
+# you will need an api from cancensus to be able to use this script 
+# 
+# options(cancensus.api_key = YOUR_API_KEY)
 
 # run this file like like: Rscript data_download CityName RegionLevel Year
 # example: Rscript data_download.R Vancouver CT 1996
+# just use this to get the vector names
+# census_labels <- list_census_vectors("CA11")
+# write.csv(census_labels, "CA11_labels.csv")
+
 args = commandArgs(trailingOnly=TRUE)
-city_args = c("Toronto", "CT")
+
 
 if (args[1] == "Vancouver") {
   CMA_UID = "59933"
@@ -225,18 +230,14 @@ if (args[3] == "1996") {
   print("The year is not ready to be downloaded.")
 }
 
-# just use this to get the vector names
-# census_labels <- list_census_vectors("CA11")
-# write.csv(census_labels, "CA11_labels.csv")
-
 census_data <- get_census(dataset = dataset_var, regions = list(CMA = CMA_UID),
                              vectors = census_vecs, level = level_var)
 
-# from stackoverflow
+# from stackoverflow, just here to make naming the files easier
 substrRight <- function(x, n){
   substr(x, nchar(x)-n+1, nchar(x))
 }
 
-write.csv(census_data, paste("E:\\forked_canada_udp/data/outputs/downloads/", as.character(city_name), substrRight(as.character(dataset_var), 2), as.character(level_var), "data.csv", sep = "_"))
+write.csv(census_data, paste("~/git/displacement-typologies/data/outputs/downloads/", as.character(city_name), substrRight(as.character(dataset_var), 2), as.character(level_var), "data.csv", sep = "_"))
 
 

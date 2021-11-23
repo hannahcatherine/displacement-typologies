@@ -6,18 +6,14 @@
 # ==========================================================================
 # ==========================================================================
 
-library(sf)
-library(dplyr)
-library(sp)
-library(spdep)
-library(raster)
-library(dbscan)
-library(tidyverse)
+pacman::p_load(sf, dplyr, sp, spdep, raster, dbscan, tidyverse)
+
 
 # ==========================================================================
 # Pull in data
 # ==========================================================================
-city_name = "Toronto"
+# city_name = commandArgs(trailingOnly = TRUE)
+city_name = "Vancouver"
 # load the data_curation csv into R
 df <- read.csv(paste("E:\\forked_canada_udp/data/outputs/databases/", city_name, "_database_2016.csv", sep = ""))
 databases <- read.csv(paste("E:\\forked_canada_udp/data/outputs/databases/", city_name, "_database_2016.csv", sep = ""))
@@ -38,8 +34,8 @@ tr_rent <- df %>%
     tr_chrent = rent16 - rent11,
     tr_pchrent = tr_chrent / rent11,
     
-    rg_rent16 = CMA_df$real_mrent_16, 
-    rg_rent11 = CMA_df$real_mrent_11,
+    rg_rent16 = rm_real_mrent_16, 
+    rg_rent11 = rm_real_mrent_11,
     rg_chrent = rg_rent16 - rg_rent11,
     rg_pchrent = rg_chrent / rg_rent11,
   ) %>% 
@@ -48,13 +44,13 @@ tr_rent <- df %>%
   group_by(GeoUID) %>% 
   filter(row_number()==1) %>% 
   ungroup()
-
+tr_rent$tr_pchrent[is.na(tr_rent$tr_pchrent)] <- 0
 # write.csv(tr_rent, "tr_rent.csv")
 # ==========================================================================
 # Create rent gap and extra local change in rent
 # ==========================================================================
 
-stsp <- st_read(paste("E:\\forked_canada_udp/data/inputs/shp/",city_name,"/",city_name,".shp", sep = ""))
+stsp <- readRDS(paste("E:\\forked_canada_udp/data/inputs/shp/Canada/", city_name, ".rds", sep = ""))
 stsp$CTUID <- as.numeric(stsp$CTUID)
 
 # join data to these tracts
@@ -126,7 +122,7 @@ lag <- lag %>% dplyr::select(-geometry)
 # ==========================================================================
 # Export Data
 # ==========================================================================
-write.csv(lag, paste("E:\\forked_canada_udp/data/outputs/lags/", city_name,"_lag.csv", sep = ""))
+write.csv(lag, file = gzfile(paste("E:\\forked_canada_udp/data/outputs/lags/", city_name,"_lag.csv.gz", sep = "")))
 
 
 

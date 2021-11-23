@@ -1,31 +1,29 @@
 # ==========================================================================
-# Map data for displacement and vulnerability measures
-# Author: Tim Thomas - timthomas@berkeley.edu
-# Created: 2019.10.13
-# 1.0 code: 2020.10.25
-# Note: The US Census API has been unreliable in some occasions. We therefore
-#   suggest downloading every API run that you do when it is successful. 
-#   The "Begin..." sections highlight these API downloads followed by a load
-#   option. Uncomment and edit these API runs as needed and then comment them 
-#   again when testing your maps. 
+# Helper file to download the desired city from national Canadian shapefile
+# Author: Hannah Moore - hmoore@berkeley.edu
+# Created: 2021.08.05
+# 1.0 code: 2021.11.01
+# download the national canadian shapefile from here:
+# https://www12.statcan.gc.ca/census-recensement/2011/geo/bound-limit/bound-limit-2016-eng.cfm
+# pick cartographic boundary file for census tracts
+
 # ==========================================================================
 
-# Clear the session
 rm(list = ls())
-options(scipen = 10) # avoid scientific notation
-
+city_name = commandArgs(trailingOnly = TRUE)
 # ==========================================================================
 # Load Libraries
 # ==========================================================================
-pacman::p_load(readxl, R.utils, sf, sp, geojsonsf, scales, data.table, tidyverse)
+pacman::p_load(R.utils, sf, sp, tidyverse)
 
-tracts <- st_read("E:\\canada_data/canada_shapefiles/lct_000b16a_e.shp")
+canada_tracts <- st_read("E:\\canada_data/canada_shapefiles/lct_000b16a_e.shp")
 
-tracts <- st_transform(tracts, st_crs("+proj=longlat +datum=WGS84"))
+canada_tracts <- st_transform(canada_tracts, st_crs("+proj=longlat +datum=WGS84"))
+saveRDS(canada_tracts, "E:\\forked_canada_udp/data/inputs/shp/Canada/canada.rds")
+# canada_tracts <- readRDS("E:\\forked_canada_udp/data/inputs/shp/Canada/canada.rds")
+city_tracts <- canada_tracts %>% dplyr::filter(CMANAME == city_name)
 
-city_tracts <- tracts %>% dplyr::filter(CMANAME == "Toronto")
-
-
-st_write(city_tracts, "toronto.shp")
-write_csv(vancouver_sf %>% st_set_geometry(NULL), "E:\\forked_canada_udp//data/outputs/vancouver_final_output_not_urban.csv")
+saveRDS(city_tracts, paste("E:\\forked_canada_udp/data/inputs/shp/Canada/", city_name, ".rds", sep = ""))
+st_write(city_tracts, paste(city_name, ".shp", sep = ""))
+# city_tracts <- readRDS(paste("E:\\forked_canada_udp/data/inputs/shp/Canada/", city_name, ".rds", sep = ""))
 

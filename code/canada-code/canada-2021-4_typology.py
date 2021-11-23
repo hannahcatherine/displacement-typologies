@@ -6,10 +6,7 @@
 # ==========================================================================
 
 import pandas as pd
-from shapely import wkt
-import geopandas as gpd
 import numpy as np
-import matplotlib.pyplot as plt
 from pathlib import Path
 import sys
 
@@ -20,35 +17,20 @@ import sys
 
 ### Choose city and census tracts of interest
 # To get city data, run the following code in the terminal
-# `python data.py <city name>`
-# Example: python data.py Atlanta
-
-# city_name = str(sys.argv[1])
-
+# `python canada-2021-4_typology.py <city name>`
+# Example: python canada-2021-4_typology.py Vancouver
 
 ###
-# When testing city analysis, use: 
 # comment this out later when this is ready for multiple canadian cities
 city_name = "Vancouver"
-
-# Run create_lag_vars.r to create lag variables
-# --------------------------------------------------------------------------
-# Note: If additional cities are added, make sure to change create_lag_vars.r
-# accordingly. 
-
+# city_name = (sys.argv[1])
 input_path = 'data/inputs/'
 output_path ='data/outputs/'
 
-lag = pd.read_csv(output_path+'/lags/' +str.lower(city_name)+ '_lag.csv') ### Read file
-typology_input = pd.read_csv(output_path+'/databases/'+str.lower(city_name)+'_database_2016.csv', index_col = 0) ### Read file
-geo_data = gpd.read_file(input_path + "shp/" +str.lower(city_name)+ "/" + str.lower(city_name)+ ".shp")
-geo_data['CTUID'] = geo_data['CTUID'].astype(float)
+lag = pd.read_csv(output_path+'lags/' + city_name + '_lag/' + city_name + '_lag.csv') ### Read file
+typology_input = pd.read_csv(output_path+'databases/'+ str.lower(city_name) +'_database_2016.csv', index_col = 0) ### Read file
 typology_input['GeoUID'] = typology_input['GeoUID'].astype(float)
-geo_data = geo_data.rename(columns = {"CTUID" : "GeoUID"})
-
-geo_typology_input = geo_data.merge(typology_input, on = "GeoUID")
-
-data = geo_typology_input.copy(deep=True)
+data = typology_input.copy(deep=True)
 
 ## Summarize Income Categorization Data
 # --------------------------------------------------------------------------
@@ -172,8 +154,8 @@ df = data
 ### ********* Super gentrification or exclusion *************
 
 df["SGE"] = np.where((df['pop06flag']==1)&
-                     (((df['VHI_pdmt_medhhinc_96'] == 1)& # High-income tract in 1996 and
-                     (df['VHI_pdmt_medhhinc_16'] == 1))) & #   High-income tract in 2016;     
+                     (((df['VHI_pdmt_medhhinc_96'] == 1)& # Very high-income tract in 1996 and
+                     (df['VHI_pdmt_medhhinc_16'] == 1))) & #   Very high-income tract in 2016;     
                      (df['real_mhhinc_16'] > df['real_mhhinc_96']) & #  Median income higher in 2016 than in 1996             --- first cell
                      (df['lmh_flag_encoded'] == 3) & #  Affordable to high income households in 2016                          --- second cell
                      ((df['change_flag_encoded'] == 1)|(df['change_flag_encoded'] == 2)| # Marginal change, increase, 
@@ -184,7 +166,7 @@ df["SGE"] = np.where((df['pop06flag'].isna())|
                      (df['VHI_pdmt_medhhinc_96'].isna())|
                      (df['VHI_pdmt_medhhinc_16'].isna())|
                      (df['real_mhhinc_96'].isna())|
-                     (df['real_mhhinc_16'].isna()), np.nan, df['VHI'])
+                     (df['real_mhhinc_16'].isna()), np.nan, df['SGE'])
 
 
 
@@ -472,16 +454,12 @@ for i in range (0, len (df)):
     
 df['typ_cat'] = cat_i
 
-print('TYPOLOGIES')
 
 ######
 # Begin Test
 ######
-f, ax = plt.subplots(1, figsize=(8, 8))
-data.plot(ax=ax, color = 'lightgrey')
-lims = plt.axis('equal')
-df[~data['typology'].isna()].plot(ax = ax, column = 'typ_cat', legend = True)
-plt.show()
+
+print('TYPOLOGIES')
 print('There are ', data['typology'].isna().sum(), 'census tract with NaN as data')
 
 ######
@@ -499,6 +477,5 @@ print('There are ', data['typology'].isna().sum(), 'census tract with NaN as dat
 
 
 df['GeoUID'] = df['GeoUID'].astype(str)
-df = df.drop(columns = 'geometry')
 print(df.groupby('typ_cat').size())
 df.to_csv(output_path+'/typologies/'+str.lower(city_name) + '_typology_output.csv')
